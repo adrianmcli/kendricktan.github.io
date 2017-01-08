@@ -1,7 +1,11 @@
 # Website stuff
 
+## Installing dependencies
 ```
-make html # Generates blog
-make serve # Serves on localhost:8000
-./push_to_github.sh # Pushes pages to githubpages
+./setup.sh
+```
+
+## Push to github
+```
+./push_to_github.sh
 ```
