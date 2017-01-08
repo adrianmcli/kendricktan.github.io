@@ -3,7 +3,5 @@
 git checkout pelican
 make clean
 make publish
-ghp-import output 
-git checkout master
-git merge gh-pages
+ghp-import output -b master
 git push --all
