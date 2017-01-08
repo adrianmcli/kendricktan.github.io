@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 AUTHOR = 'Kendrick Tan'
 SITENAME = "Kendrick's Blog"
-SITEURL = 'https://kendricktan.github.io'
+SITEURL = '//kendricktan.github.io'
 
 PATH = 'content'
 
@@ -29,19 +29,19 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 # Blogroll
-LINKS = (('portfolio', 'https://goo.gl/hU5G97'),)
+LINKS = (('portfolio', '//goo.gl/hU5G97'),)
 
 # Social widget
-SOCIAL = (('github', 'https://github.com/kendricktan'),
-        ('linkedin', 'https://au.linkedin.com/in/tankendrick'),
-        ('twitter', 'https://twitter.com/kendricktrh'),
-        ('medium', 'https://medium.com/@kendricktan0814'),)
+SOCIAL = (('github', '//github.com/kendricktan'),
+        ('linkedin', '//au.linkedin.com/in/tankendrick'),
+        ('twitter', '//twitter.com/kendricktrh'),
+        ('medium', '//medium.com/@kendricktan0814'),)
 
 DEFAULT_PAGINATION = 10
 
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
-GITHUB_URL = 'http://github.com/kendricktan/'
+GITHUB_URL = '//github.com/kendricktan/'
 
 # Theme
 THEME = "Flex"
@@ -49,6 +49,6 @@ THEME = "Flex"
 # SIDEBAR
 SITETITLE = u'Kendrick Tan'
 SITESUBTITLE = u'Machine Learning | Full Stack'
-SITELOGO = u'https://i.imgur.com/WCKPhvf.png'
+SITELOGO = u'//i.imgur.com/WCKPhvf.png'
 
 COPYRIGHT_YEAR = 2016
