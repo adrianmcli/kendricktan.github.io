@@ -1,7 +1,7 @@
 # Website stuff
 
 ```
-make html
-ghp-import output -b master
-git push origin master
+make html # Generates blog
+make serve # Serves on localhost:8000
+./push_to_github.sh # Pushes pages to githubpages
 ```

@@ -1,5 +1,6 @@
 #!/bin/bash
 
-make html
+make clean
+make publish 
 ghp-import output -b master
 git push origin master

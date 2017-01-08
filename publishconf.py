@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/cktangithubiousr/bin/env python
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
 
@@ -19,6 +19,5 @@ CATEGORY_FEED_ATOM = 'feeds/%s.atom.xml'
 DELETE_OUTPUT_DIRECTORY = True
 
 # Following items are often useful when publishing
-
-#DISQUS_SITENAME = ""
-#GOOGLE_ANALYTICS = ""
+DISQUS_SITENAME = "kendricktangithubio"
+GOOGLE_ANALYTICS = "UA-71060764-2"
