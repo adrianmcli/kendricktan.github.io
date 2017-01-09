@@ -49,6 +49,6 @@ THEME = "Flex"
 # SIDEBAR
 SITETITLE = u'Kendrick Tan'
 SITESUBTITLE = u'Machine Learning | Full Stack'
-SITELOGO = u'//i.imgur.com/WCKPhvf.png'
+SITELOGO = u'//i.imgur.com/SNGMjOV.png'
 
 COPYRIGHT_YEAR = 2016
