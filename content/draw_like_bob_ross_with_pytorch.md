@@ -10,7 +10,7 @@ Category: python, machine-learning, deep-learning
 
 # What is drawlikebobross?
 
-[__drawlikebobross__](github.com/kendricktan/drawlikebobross) aims to turn a patched color photo into a Bob Ross styled photo, like so:
+[__drawlikebobross__](https://github.com/kendricktan/drawlikebobross) aims to turn a patched color photo into a Bob Ross styled photo, like so:
 
 <center> ![ ](https://i.imgur.com/9rdXfdM.png) </center>
 
@@ -60,7 +60,7 @@ So we want color patches coming in, and Bob Ross styled images coming out, the p
 
 <center>![](https://i.imgur.com/hyWoQ18.png)</center>
 
-I've chosen to use [pytorch](pytorch.org) to implement the model in because I've been using it tons in my [work](popgun.ai), as it has a super pleasant and consistent API (_looking at you tensorflow_), and I just feel like my productivity has increase tenfolds.
+I've chosen to use [pytorch](https://pytorch.org) to implement the model in because I've been using it tons in my [work](https://popgun.ai), as it has a super pleasant and consistent API (_looking at you tensorflow_), and I just feel like my productivity has increase tenfolds.
 
 The [model pipeline](https://github.com/kendricktan/drawlikebobross/tree/master/aae) has also been abstracted into 4 components:
 
