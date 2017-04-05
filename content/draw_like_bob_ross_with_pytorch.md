@@ -84,3 +84,7 @@ Since I'm using a thinkpad t460s with a shitty GPU, I rented a g2 on AWS and chu
 # Final thoughts
 
 I had a ton of fun making this lil project, if machine learning interests you, I would highly recommend doing a small weekend project like so.
+
+Also, did I mention that the project has a web UI to interact with the model? ;-)
+
+![](https://i.imgur.com/FWTPNJY.png)
