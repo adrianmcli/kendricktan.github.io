@@ -4,7 +4,7 @@ Category: python, machine-learning, deep-learning
 
 ---
 
-*I've been playing around with [autoencoders](http://ufldl.stanford.edu/tutorial/unsupervised/Autoencoders/), and have been fully fascinated with the idea of using one in a cool, fun project, and so [__drawlikebobross__](github.com/kendricktan/drawlikebobross) was born.*
+*I've been playing around with [autoencoders](http://ufldl.stanford.edu/tutorial/unsupervised/Autoencoders/), and have been fully fascinated with the idea of using one in a cool, fun project, and so [__drawlikebobross__](https://github.com/kendricktan/drawlikebobross) was born.*
 
 ---
 
