@@ -45,7 +45,7 @@ To minimize the training time, I've preprocessed the bulk of images into smoothe
 
 ### Neural Network Architecture
 
-The network architecture I'm using is called an _Adversarial Autoencoder_, or _aae_ for short. You can read more about them [here](http://hjweide.github.io/adversarial-autoencoders).
+The network architecture I'm using is called an _Adversarial Autoencoder_, or _aae_ for short. You can read more about them [here](http://hjweide.github.io/adversarial-autoencoders), original paper [here](https://arxiv.org/abs/1511.05644)
 
 TL;DR: _"The idea I find most fascinating in this paper is the concept of mapping the encoder’s output distribution q(z|x) to an arbitrary prior distribution p(z) using adversarial training (rather than variational inference)." - Hendrik J. Weideman_
 
@@ -60,7 +60,7 @@ So we want color patches coming in, and Bob Ross styled images coming out, the p
 
 <center>![](https://i.imgur.com/hyWoQ18.png)</center>
 
-I've chosen to use [pytorch](https://pytorch.org) to implement the model in because I've been using it tons in my [work](https://popgun.ai), as it has a super pleasant and consistent API (_looking at you tensorflow_), and I just feel like my productivity has increase tenfolds.
+I've chosen to use [pytorch](http://pytorch.org) to implement the model in because I've been using it tons in my [work](http://popgun.ai), as it has a super pleasant and consistent API (_looking at you tensorflow_), and I just feel like my productivity has increase tenfolds.
 
 The [model pipeline](https://github.com/kendricktan/drawlikebobross/tree/master/aae) has also been abstracted into 4 components:
 
