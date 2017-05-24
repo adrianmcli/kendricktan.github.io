@@ -1,10 +1,8 @@
 Title: About
 Date: 2017-01-08
 
-Software and Machine Learning engineer at Queensland University of Technology, Australia majoring in IT/Mechatronics. 
+Undergrad at Queensland University of Technology, Australia majoring in IT.
 
-Familiar with OOP and is currently looking into functional.
+Machine Learning engineer at [popgun.ai](http://popgun.ai).
 
-Uses vim key bindings for almost everything.
-
-Like cats.
+[Techstars Music 2017](http://www.techstars.com/programs/music-program/) Alumni.
