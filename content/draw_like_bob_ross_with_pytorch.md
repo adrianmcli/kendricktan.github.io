@@ -1,6 +1,8 @@
 Title: Draw Like Bob Ross (With Pytorch!)
 Date: 2017/04/05
 Category: python, machine-learning, deep-learning
+Summary: Make bob-ross styled paintings with the power of autoencoders!
+
 
 ---
 
