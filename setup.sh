@@ -1,6 +1,11 @@
 #!/bin/bash
-echo "Installing Flex theme..."
-git clone https://github.com/alexandrevicenzi/Flex.git
-pelican-themes -i Flex
-rm -rf Flex
-echo "Installed Flex theme and removed folder"
+echo "Installing markdown + pelican"
+pip install markdown pelican webassets
+
+echo "Installing theme..."
+git clone https://github.com/kendricktan/voce.git
+pip install -r voce/requirements.txt
+pelican-themes -r voce
+pelican-themes -i voce
+rm -rf voce
+echo "Installed theme and removed folder"

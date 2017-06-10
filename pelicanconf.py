@@ -2,11 +2,16 @@
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
 
+import os
+
+
 AUTHOR = 'Kendrick Tan'
 SITENAME = "Kendrick's Blog"
 SITEURL = '//kendricktan.github.io'
 
 PATH = 'content'
+PLUGIN_PATHS = os.path.join("./", "plugins")
+PLUGINS = ['assets']
 
 TIMEZONE = 'Australia/Brisbane'
 
@@ -27,15 +32,24 @@ CATEGORY_FEED_ATOM = None
 TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
+MANGLE_EMAILS = True
+FUZZY_DATES = False
 
 # Blogroll
-LINKS = (('portfolio', '//goo.gl/hU5G97'),)
+LINKS = (('home', SITEURL),
+         ('about', '/pages/about.html'),
+         ('archives', '/archives.html'),
+         ('contact', '/pages/contact.html'),
+         ('portfolio', '//goo.gl/hU5G97'))
+
+TAGS_URL = 'tags.html'
+ARCHIVES_URL = 'archives.html'
 
 # Social widget
-SOCIAL = (('github', '//github.com/kendricktan'),
-        ('linkedin', '//au.linkedin.com/in/tankendrick'),
-        ('twitter', '//twitter.com/kendricktrh'),
-        ('medium', '//medium.com/@kendricktan0814'),)
+SOCIAL = (('Github', '//github.com/kendricktan'),
+          ('Linkedin', '//au.linkedin.com/in/tankendrick'),
+          ('Medium', '//medium.com/@kendricktan0814'),
+          ('Twitter', '//twitter.com/kendricktrh'),)
 
 DEFAULT_PAGINATION = 10
 
@@ -44,11 +58,10 @@ RELATIVE_URLS = True
 GITHUB_URL = '//github.com/kendricktan/'
 
 # Theme
-THEME = "Flex"
+THEME = "voce"
 
 # SIDEBAR
 SITETITLE = u'Kendrick Tan'
-SITESUBTITLE = u'Machine Learning | Full Stack'
-SITELOGO = u'//i.imgur.com/SNGMjOV.png'
+SITESUBTITLE = u'I organize matricies so it identifies cat pictures'
 
-COPYRIGHT_YEAR = 2016
+COPYRIGHT_YEAR = 2017
