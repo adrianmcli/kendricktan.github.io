@@ -62,6 +62,6 @@ THEME = "voce"
 
 # SIDEBAR
 SITETITLE = u'Kendrick Tan'
-SITESUBTITLE = u'I organize matricies so it identifies cat pictures'
+SITESUBTITLE = u'I organize matricies so it recognizes cats'
 
 COPYRIGHT_YEAR = 2017

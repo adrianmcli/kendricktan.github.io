@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Installing markdown + pelican"
-pip install markdown pelican webassets
+pip install markdown pelican webassets ghp-import
 
 echo "Installing theme..."
 git clone https://github.com/kendricktan/voce.git
