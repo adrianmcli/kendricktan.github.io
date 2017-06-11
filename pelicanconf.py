@@ -7,7 +7,7 @@ import os
 
 AUTHOR = 'Kendrick Tan'
 SITENAME = "Kendrick's Blog"
-SITEURL = '//kendricktan.github.io'
+SITEURL = '//kndrck.co'
 
 PATH = 'content'
 PLUGIN_PATHS = os.path.join("./", "plugins")
@@ -36,10 +36,7 @@ MANGLE_EMAILS = True
 FUZZY_DATES = False
 
 # Blogroll
-LINKS = (('home', SITEURL),
-         ('about', '/pages/about.html'),
-         ('archives', '/archives.html'),
-         ('contact', '/pages/contact.html'),
+LINKS = (('about', '/pages/about.html'),
          ('portfolio', '//goo.gl/hU5G97'))
 
 TAGS_URL = 'tags.html'
@@ -60,8 +57,10 @@ GITHUB_URL = '//github.com/kendricktan/'
 # Theme
 THEME = "voce"
 
-# SIDEBAR
+# Site title
 SITETITLE = u'Kendrick Tan'
 SITESUBTITLE = u'I organize matricies so it recognizes cats'
 
 COPYRIGHT_YEAR = 2017
+
+FOOTER_INFO = "kendricktan0814@gmail.com"

@@ -1,9 +1,11 @@
 Title: About
 Date: 2017-01-08
 
-<img style="float: left; margin-top: 30px; padding: 20px;" src="https://i.imgur.com/SNGMjOV.png" width=200>
+<img src="https://i.imgur.com/SNGMjOV.png" width=300>
 
-IT Undergrad at Queensland University of Technology.<br/><br/>
-Machine Learning engineer at [popgun.ai](http://popgun.ai).<br/><br/>
-Avid user of Python and Haskell.<br/><br/>
-[Techstars Music 2017](http://www.techstars.com/programs/music-program/) Alumni.
+<div style="text-align: center">
+IT Undergrad at Queensland University of Technology.<br/>
+Machine Learning engineer at <a href="http://popgun.ai">popgun.ai</a><br/>
+Avid user of Python and Haskell.<br/>
+<a href="http://www.techstars.com/programs/music-program/">Techstars Music 2017</a> Alumni.
+</div>
