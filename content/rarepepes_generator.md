@@ -1,4 +1,4 @@
-Title: Rare Pepes Generator
+Title: Rare Pepe Generator
 Date: 2017/05/24
 Category: python, machine-learning, deep-learning
 Summary: It's 2020 and the Pepe economy has crashed, luckily you can now generate them quite easily.
