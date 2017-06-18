@@ -164,3 +164,9 @@ Steps to index faces:
 </center>
 
 Again, you can check the live project here - [https://iffse.kndrck.co/](https://iffse.kndrck.co/)
+
+---
+
+UPDATE 1: So... the first server got hugged to death at 4am in the morning. Thank you...? I've spin up a general instance (instead of a micro) to handle the load.
+
+---
