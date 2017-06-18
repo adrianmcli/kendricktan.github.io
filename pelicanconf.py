@@ -38,7 +38,8 @@ FUZZY_DATES = False
 
 # Blogroll
 LINKS = (('about', '/pages/about.html'),
-         ('portfolio', '//goo.gl/hU5G97'))
+         ('portfolio', '//goo.gl/hU5G97'),
+         ('projects', '/pages/projects.html'))
 
 TAGS_URL = 'tags.html'
 ARCHIVES_URL = 'archives.html'
