@@ -61,7 +61,7 @@ THEME = "voce"
 
 # Site title
 SITETITLE = u'Kendrick Tan'
-SITESUBTITLE = u'I organize matricies so it recognizes cats'
+SITESUBTITLE = u'I organize matrices so it recognizes cats'
 
 COPYRIGHT_YEAR = 2017
 
