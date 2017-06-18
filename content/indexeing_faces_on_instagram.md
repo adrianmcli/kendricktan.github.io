@@ -78,7 +78,7 @@ So far so good, I wrote a [multithreaded scrapper](https://github.com/kendrickta
     <h6>Indexes around 6-8 images a second</h6>
 </center>
 
-The next morning I woke up and decided to check its progress, and got around 200k images. Sounds good right? ༼ʘ̚ل͜ʘ̚༽ Not really, Instagram gets ~35 million images per day, thats only __0.2%__ of the images they get __per day__. But whatevs, 100k is enough for me, I think. (ღ˘⌣˘ღ)
+The next morning I woke up and decided to check its progress, and got around 200k images. Sounds good right? ༼ʘ̚ل͜ʘ̚༽ Not really, Instagram gets ~35 million images per day, thats only __0.2%__ of the images they get __per day__. But whatevs, 200k is enough for me, I think. (ღ˘⌣˘ღ)
 
 
 # Preprocessing our images
@@ -90,7 +90,7 @@ We now have our images, problem is they aren't normalized.
     <h6>random ig girl</h6>
 </center>
 
-See how the above face is tilted to the right? Thats baaaad. We can't have normalized inputs that way ب_ب. So I uh, did a bit of googling and found out about this cool library called [dlib](https://pypi.python.org/pypi/dlib) that does what I want it to do. It is able to find the 68 landmarks of the face with some magic, and using that I can transform the original image to an aligned face.
+See how the above face is tilted to the right? Thats baaaad. We can't have feed it into the black machine learning box that way ب_ب. So I uh, did a bit of googling and found out about this cool library called [dlib](https://pypi.python.org/pypi/dlib) that does what I want it to do. It is able to find the 68 landmarks of the face with some magic, and using that I can transform the original image to an aligned face.
 
 <center>
     <img width=30% src="//cdn-images-1.medium.com/max/800/1*AbEg31EgkbXSQehuNJBlWg.png">
@@ -113,9 +113,9 @@ With a little bit more [magic](https://github.com/kendricktan/iffse/blob/master/
 
 # 'Building' our Machine Learning model
 
-Remember how I said we needed alot of data to train __our__ model? I lied. I tried to get the [MS Celeb 1M](https://www.microsoft.com/en-us/research/project/ms-celeb-1m-challenge-recognizing-one-million-celebrities-real-world/) dataset. But do you really think MicroSoft is really going to hand over the dataset to some kind who says he's going to use it to index faces on instagram and be non-creepy? (´・ω・)っ由
+Remember how I said we needed alot of data to train __our__ model? I lied. I tried to get the [MS Celeb 1M](https://www.microsoft.com/en-us/research/project/ms-celeb-1m-challenge-recognizing-one-million-celebrities-real-world/) dataset. But do you really think Microsoft is really going to hand over the dataset to some kid who says he's going to use it to index faces on instagram and be non-creepy? (´・ω・)っ由
 
-In the end, I decided to just use a pretrained model from [OpenFace](https://github.com/cmusatyalab/openface/blob/master/models/get-models.sh). Problem is, these cool kids are using `Torch`, and I'm using `PyTorch`. Whats the difference? There's a `Py` infront of `PyTorch`, having a longer name must mean its newer and better. And communicating between `Lua` (which is what `Torch` is built on) and `Python` induces a large overhead and is a huge hassle.
+In the end, I decided to just use a pretrained model from [OpenFace](https://github.com/cmusatyalab/openface/blob/master/models/get-models.sh). Problem is, these cool kids are using `Torch`, and I'm using `PyTorch`. Whats the difference? There's a `Py` infront of `PyTorch`, having a longer name must mean its newer and better. And communicating between `Lua` (what `Torch` is built on) and `Python` (what `PyTorch` is built on) induces a large overhead and is a huge hassle.
 
 Using my 1337 googling skills, I found a [OpenFacePytorch implementation online from some korean guy who works at intel](https://github.com/thnkim/OpenFacePytorch). I cloned the repository and low and behold! It works! Thank you Pete Tae-hoon Kim!
 
@@ -163,4 +163,4 @@ Steps to index faces:
     <img src="//media.giphy.com/media/upg0i1m4DLe5q/giphy.gif">
 </center>
 
-Again, you can check the live project here - https://iffse.kndrck.co/
+Again, you can check the live project here - [https://iffse.kndrck.co/](https://iffse.kndrck.co/)
