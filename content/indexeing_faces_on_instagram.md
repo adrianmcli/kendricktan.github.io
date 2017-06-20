@@ -169,4 +169,6 @@ Again, you can check the live project here - [https://iffse.kndrck.co/](https://
 
 UPDATE 1: So... the first server got hugged to death at 4am in the morning. Thank you...? I've spin up a general instance (instead of a micro) to handle the load.
 
+UPDATE 2: Day 2, server ran out of storage space, also added new sharable features :)
+
 ---
