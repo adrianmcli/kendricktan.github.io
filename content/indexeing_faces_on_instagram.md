@@ -171,4 +171,6 @@ UPDATE 1: So... the first server got hugged to death at 4am in the morning. Than
 
 UPDATE 2: Day 2, server ran out of storage space, also added new sharable features :)
 
+UPDATE 3: 2017/06/26 08:30, I decided to shut down the server. If you would like to play around with it more, host your own!
+
 ---
