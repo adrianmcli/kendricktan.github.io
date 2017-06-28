@@ -78,7 +78,7 @@ So far so good, I wrote a [multithreaded scrapper](https://github.com/kendrickta
     <h6>Indexes around 6-8 images a second</h6>
 </center>
 
-The next morning I woke up and decided to check its progress, and got around 200k images. Sounds good right? ༼ʘ̚ل͜ʘ̚༽ Not really, Selfie Central gets ~35 million images per day, thats only __0.2%__ of the images they get __per day__. But whatevs, 200k is enough for me, I think. (ღ˘⌣˘ღ)
+The next morning I woke up and decided to check its progress, and got around 200k images. Sounds good right? ༼ʘ̚ل͜ʘ̚༽ Not really, Selfie Central gets ~35 million images per day, thats only __0.4%__ of the images they get __per day__. But whatevs, 200k is enough for me, I think. (ღ˘⌣˘ღ)
 
 
 # Preprocessing our images
