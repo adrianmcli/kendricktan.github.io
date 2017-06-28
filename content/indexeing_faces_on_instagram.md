@@ -21,16 +21,16 @@ Essentially building a database of indexed faces ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡
 
 Before we start off doing anything machine learning-y we need a bunch of data, a bunch of #selfies to train our model on. Hmmm, sounds like we need to drop by and pay [some photo sharing website](https://www.instagram.com) a visit ( ͡°╭͜ʖ╮͡° ).
 
-### Loaning Images from Instagram
+### Loaning Images from Selfie Central
 
-I've decided to use the word 'loan' instead of scrap, as scrapping has such negative connotations with it. Anyway, I wanted a way to be able to loan images Instagram without providing them with any of my keys. After playing around with the web app for a couple of minutes, I discover the [tags endpoint](https://www.instagram.com/explore/tags/selfie/), which gives like infinite images without authentication.
+I've decided to use the word 'loan' instead of scrap, as scrapping has such negative connotations with it. Anyway, I wanted a way to be able to loan images Selfie Central without providing them with any of my keys. After playing around with the web app for a couple of minutes, I discover the [tags endpoint](https://www.instagram.com/explore/tags/selfie/), which gives like infinite images without authentication.
 
 <center>
     <img src="https://thumbs.gfycat.com/YellowishPositiveBeagle-size_restricted.gif">
     <h6>#selfies. Note the 'Sign Up' Button</h6>
 </center>
 
-Perfect! Now to just automate the process of loaning images from Instagram into our server.
+Perfect! Now to just automate the process of loaning images from Selfie Central into our server.
 
 
 ### Reverse Engineering the tags endpoint
@@ -78,7 +78,7 @@ So far so good, I wrote a [multithreaded scrapper](https://github.com/kendrickta
     <h6>Indexes around 6-8 images a second</h6>
 </center>
 
-The next morning I woke up and decided to check its progress, and got around 200k images. Sounds good right? ༼ʘ̚ل͜ʘ̚༽ Not really, Instagram gets ~35 million images per day, thats only __0.2%__ of the images they get __per day__. But whatevs, 200k is enough for me, I think. (ღ˘⌣˘ღ)
+The next morning I woke up and decided to check its progress, and got around 200k images. Sounds good right? ༼ʘ̚ل͜ʘ̚༽ Not really, Selfie Central gets ~35 million images per day, thats only __0.2%__ of the images they get __per day__. But whatevs, 200k is enough for me, I think. (ღ˘⌣˘ღ)
 
 
 # Preprocessing our images
@@ -101,14 +101,14 @@ Dlib's super easy to use, just from looking at the [example code](http://dlib.ne
 
 <center>
     <img width=30% src="https://i.imgur.com/tSbx3yn.png">
-    <h6>68 facial landmaks on random ig girl</h6>
+    <h6>68 facial landmaks on random #selfie</h6>
 </center>
 
 With a little bit more [magic](https://github.com/kendricktan/iffse/blob/master/iffse/utils/cv/faces.py#L80), I was able to align the face, voila! ◔̯◔
 
 <center>
     <img width=30% src="https://i.imgur.com/kRF34rv.png">
-    <h6>ig girl with aligned face</h6>
+    <h6>aligned #selfie</h6>
 </center>
 
 # 'Building' our Machine Learning model
