@@ -1,25 +1,25 @@
-Title: Indexing Faces on Instagram
+Title: Indexing Faces on Selfie Central
 Date: 2017/06/18
 Category: python, machine-learning, deep-learning, pytorch
-Summary: Scrap, preprocess, and index facial data obtained from Instagram
+Summary: Scrap, preprocess, and index facial data obtained from Selfie Central
 
 ---
-I just wanted to build something cool using machine learning on a bunch of public images. But after showing it to a couple of my *"friends"* they thought it was too creepy and Instagram might sue me for breaking their [platform policy](https://www.instagram.com/about/legal/terms/api/) and I should stop doing it.
+I just wanted to build something cool using machine learning on a bunch of public images. But after showing it to a couple of my *"friends"* they thought it was too creepy and [Selfie Central](https://www.instagram.com) might sue me for breaking their [platform policy](https://www.instagram.com/about/legal/terms/api/) and I should stop doing it.
 
 So, I did what most sane people would do - write a blog post detailing how I did it, and [open source](https://github.com/kendricktan/iffse) it.
 
-__Whats the worst that could happen?__ ( ͡° ͜ʖ ͡°) > [IFFSE -Instagram Facial Feature Search Engine](https://iffse.kndrck.co) <
+__Whats the worst that could happen?__ ( ͡° ͜ʖ ͡°) > [IFFSE - Selfie Central Facial Feature Search Engine](https://iffse.kndrck.co) <
 
 ---
 
 # What did you do?
-Err.. that's a good question. I basically told a computer to download a bunch of images containing faces from Instagram, and sort them according to similarity.
+Err.. that's a good question. I basically told a computer to download a bunch of images containing faces from , and sort them according to similarity.
 
 Essentially building a database of indexed faces ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°).
 
 # So how did you do it?
 
-Before we start off doing anything machine learning-y we need a bunch of data, a bunch of #selfies to train our model on. Hmmm, sounds like we need to drop by and pay [Instagram.com](https://www.instagram.com) a visit ( ͡°╭͜ʖ╮͡° ).
+Before we start off doing anything machine learning-y we need a bunch of data, a bunch of #selfies to train our model on. Hmmm, sounds like we need to drop by and pay [some photo sharing website](https://www.instagram.com) a visit ( ͡°╭͜ʖ╮͡° ).
 
 ### Loaning Images from Instagram
 
@@ -39,7 +39,7 @@ I noticed that everytime I scroll to the bottom of the page, this particular req
 
 <center>
     <img width=75% src="https://i.imgur.com/Lc1Qpim.png">
-    <h6>graphql endpoint: https://www.instagram.com/graphql/query/?query_id=17882293912014529&tag_name=selfie&first=6&after=J0HWUYXkgAAAF0HWUYXigAAAFiYA</h6>
+    <h6>graphql endpoint: https://www.Selfie Central.com/graphql/query/?query_id=17882293912014529&tag_name=selfie&first=6&after=J0HWUYXkgAAAF0HWUYXigAAAFiYA</h6>
 </center>
 
 Looks like an API call, I wonder what could that hold?
@@ -49,18 +49,18 @@ Looks like an API call, I wonder what could that hold?
     <h6>JSON dump of the graphql endpoint</h6>
 </center>
 
-Woah nifty! The URL to the images are easily accesible and it looks like the only variables we need to change are the `query_id` and `after`. `after` looks suspiciously similar to `end_cursor` obtained from the graphql query endpoint, I wonder if it would make a difference if I changed the `after` variable in our query to be `J0HWUYaEwAAAF0HWUYaAwAAAFlIA`, making our GET request url now: `https://www.instagram.com/graphql/query/?query_id=17882293912014529&tag_name=selfie&first=6&after=J0HWUYaEwAAAF0HWUYaAwAAAFlIA`. Querying it gives us:
+Woah nifty! The URL to the images are easily accesible and it looks like the only variables we need to change are the `query_id` and `after`. `after` looks suspiciously similar to `end_cursor` obtained from the graphql query endpoint, I wonder if it would make a difference if I changed the `after` variable in our query to be `J0HWUYaEwAAAF0HWUYaAwAAAFlIA`, making our GET request url now: `https://www.Selfie Central.com/graphql/query/?query_id=17882293912014529&tag_name=selfie&first=6&after=J0HWUYaEwAAAF0HWUYaAwAAAFlIA`. Querying it gives us:
 
 <center>
     <img width=75% src="https://i.imgur.com/ic6sY24.png">
     <h6>Bingo, we're now able to continously query for new data</h6>
 </center>
 
-What about `query_id`? At first I thought it was some constant as I couldn't find it anywhere and kinda just hardcoded it into my queries and it worked for a while until I started getting timeout errors ♪~ ᕕ(ᐛ)ᕗ . In the end, I found out that the `query_id` is generated from the file `en_US_Commons.js`, which is included during your inital request to Instagram.
+What about `query_id`? At first I thought it was some constant as I couldn't find it anywhere and kinda just hardcoded it into my queries and it worked for a while until I started getting timeout errors ♪~ ᕕ(ᐛ)ᕗ . In the end, I found out that the `query_id` is generated from the file `en_US_Commons.js`, which is included during your inital request to Selfie Central.
 
-So, the journey of automating our loaning of images from Instagram currently looks like:
+So, the journey of automating our loaning of images from Selfie Central currently looks like:
 
-1. GET `instagram.com/explore/tags/<TAG>`
+1. GET `Selfie Central.com/explore/tags/<TAG>`
 2. Find `display_url`(s), `query_id` and `end_cursor` from step 1.
 3. Query graphql endpoint using the variables obtained from last step.
 4. Store `display_url`(s) and get new `end_cursor` from step 3.
@@ -87,7 +87,7 @@ We now have our images, problem is they aren't normalized.
 
 <center>
     <img width=30% src="https://i.imgur.com/qCaGYGe.jpg">
-    <h6>random ig girl</h6>
+    <h6>random #selfie</h6>
 </center>
 
 See how the above face is tilted to the right? Thats baaaad. We can't have feed it into the black machine learning box that way ب_ب. So I uh, did a bit of googling and found out about this cool library called [dlib](https://pypi.python.org/pypi/dlib) that does what I want it to do. It is able to find the 68 landmarks of the face with some magic, and using that I can transform the original image to an aligned face.
@@ -113,7 +113,7 @@ With a little bit more [magic](https://github.com/kendricktan/iffse/blob/master/
 
 # 'Building' our Machine Learning model
 
-Remember how I said we needed alot of data to train __our__ model? I lied. I tried to get the [MS Celeb 1M](https://www.microsoft.com/en-us/research/project/ms-celeb-1m-challenge-recognizing-one-million-celebrities-real-world/) dataset. But do you really think Microsoft is really going to hand over the dataset to some kid who says he's going to use it to index faces on instagram and be non-creepy? (´・ω・)っ由
+Remember how I said we needed alot of data to train __our__ model? I lied. I tried to get the [MS Celeb 1M](https://www.microsoft.com/en-us/research/project/ms-celeb-1m-challenge-recognizing-one-million-celebrities-real-world/) dataset. But do you really think Microsoft is really going to hand over the dataset to some kid who says he's going to use it to index faces on Selfie Central and be non-creepy? (´・ω・)っ由
 
 In the end, I decided to just use a pretrained model from [OpenFace](https://github.com/cmusatyalab/openface/blob/master/models/get-models.sh). Problem is, these cool kids are using `Torch`, and I'm using `PyTorch`. Whats the difference? There's a `Py` infront of `PyTorch`, having a longer name must mean its newer and better. And communicating between `Lua` (what `Torch` is built on) and `Python` (what `PyTorch` is built on) induces a large overhead and is a huge hassle.
 
@@ -154,7 +154,7 @@ Just hope the FBI doesn't come knocking on my door. (>人<)
 
 Steps to index faces:
 
-1. Load images from Instagram
+1. Load images from Selfie Central
 2. Preprocess and normalize loaded images
 3. Pass image through a blackbox and index image with blackbox outputs
 4. Use an algorithm like KNN to find images with similar indexes
@@ -163,8 +163,6 @@ Steps to index faces:
     <img src="//media.giphy.com/media/upg0i1m4DLe5q/giphy.gif">
 </center>
 
-Again, you can check the live project here - [https://iffse.kndrck.co/](https://iffse.kndrck.co/)
-
 ---
 
 UPDATE 1: So... the first server got hugged to death at 4am in the morning. Thank you...? I've spin up a general instance (instead of a micro) to handle the load.
@@ -172,5 +170,7 @@ UPDATE 1: So... the first server got hugged to death at 4am in the morning. Than
 UPDATE 2: Day 2, server ran out of storage space, also added new sharable features :)
 
 UPDATE 3: 2017/06/26 08:30, I decided to shut down the server. If you would like to play around with it more, host your own!
+
+UPDATE 4: Got an email from Instagram, rebranded some stuff I guess.
 
 ---
