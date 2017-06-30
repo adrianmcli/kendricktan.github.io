@@ -25,14 +25,6 @@ Before we start off doing anything machine learning-y we need a bunch of data, a
 
 I've decided to use the word 'loan' instead of scrap, as scrapping has such negative connotations with it. Anyway, I wanted a way to be able to loan images Selfie Central without providing them with any of my keys. After playing around with the web app for a couple of minutes, I discover the [tags endpoint](https://www.instagram.com/explore/tags/selfie/), which gives like infinite images without authentication.
 
-<center>
-    <img src="https://thumbs.gfycat.com/YellowishPositiveBeagle-size_restricted.gif">
-    <h6>#selfies. Note the 'Sign Up' Button</h6>
-</center>
-
-Perfect! Now to just automate the process of loaning images from Selfie Central into our server.
-
-
 ### Reverse Engineering the tags endpoint
 
 I noticed that everytime I scroll to the bottom of the page, this particular request pops up:
