@@ -163,6 +163,6 @@ UPDATE 2: Day 2, server ran out of storage space, also added new sharable featur
 
 UPDATE 3: 2017/06/26 08:30, I decided to shut down the server. If you would like to play around with it more, host your own!
 
-UPDATE 4: Got an email from Instagram, rebranded some stuff I guess.
+UPDATE 4: 2017/306/30 Got an email from Selfie Central, need to rebrand, losing all my disqus comments. Sad days :(
 
 ---
