@@ -1,4 +1,4 @@
 Title: Projects
 
 
-- #### [IFFSE - Instagram Facial Feature Search Engine](https://github.com/kendricktan/iffse)
+- #### [IFFSE - Facial Feature Search Engine](https://github.com/kendricktan/iffse)
