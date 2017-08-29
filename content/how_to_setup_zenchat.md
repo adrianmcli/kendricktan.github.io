@@ -42,7 +42,7 @@ rpcpassword=MY_VERY_STRONG_PASSWORD_HERE_3276782193
 
 # Getting ZENChat
 
-The official and latest releases for ZENChat will can be found on github. You can grab them <a href="https://github.com/kendricktan/ZENChat/releases">here</a>.
+The official and latest releases for ZENChat will can be found on github. You can grab them <a href="https://github.com/ZencashOfficial/ZENChat/releases">here</a>.
 
 Download the files relevant to your operating system and extract them, there should be an executable within the folder. Run the executable, and you should be greeted with the following:
 
