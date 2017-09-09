@@ -1,4 +1,4 @@
 Title: Projects
 
 
-- #### [IFFSE - Facial Feature Search Engine](https://github.com/kendricktan/iffse)
+[You can view all of my projects on my github page.](https://github.com/kendricktan)
