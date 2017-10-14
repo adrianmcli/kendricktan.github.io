@@ -10,7 +10,7 @@ SITENAME = "Kendrick's Blog"
 SITEURL = '//kndrck.co'
 
 PATH = 'content'
-PLUGIN_PATHS = os.path.join("./", "plugins")
+PLUGIN_PATHS = [os.path.join("./", "plugins")]
 PLUGINS = ['assets']
 
 TIMEZONE = 'Australia/Brisbane'
@@ -25,6 +25,17 @@ STATIC_PATHS = [
 EXTRA_PATH_METADATA = {
     'extra/favicon.ico': {'path': 'favicon.ico'},
     'extra/CNAME': {'path': 'CNAME'}
+}
+
+MARKDOWN = {
+    'extension_configs' : {
+        'markdown.extensions.codehilite' : {'css_class': 'highlight', 'linenums': True},
+        'markdown.extensions.abbr' : {},
+        'markdown.extensions.footnotes' : {},
+        'markdown.extensions.tables' : {},
+        'markdown.extensions.toc' : {},
+        'markdown.extensions.fenced_code' : {}
+    }
 }
 
 # Feed generation is usually not desired when developing
