@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.55">
+        <meta name="keywords" content="Linux,ChromeOS,HTML,CSS,JavaScript,AWS,Programming,Software Engineering,Software Development,Computer Science,UIUC,CTO">
+        <meta name="description" content="Chief Technology Officer, Computer Scientist, Engineer, Technologist, Linux User, UIUC Alumnus" />
+        
+        <title>Building a Minimal Blockchain in Haskell | Kendrick Tan</title>
+        
+        <link href="https://fonts.googleapis.com/css?family=Lato|PT+Serif" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/syntax.css" />
+        <link rel="stylesheet" type="text/css" href="../../assets/font-awesome/css/font-awesome.min.css" />
+        <link href="../../images/fav.png" rel="shortcut icon">
+        <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+        
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../../">Kendrick Tan</a>
+            </div>
+            <div id="navigation">
+                <a href="../../">Home</a>
+                <a href="../../about/">About</a>
+                <a href="https://goo.gl/hU5G97">Resume</a>
+            </div>
+        </div>
+
+        <div id="content">
+            
+                <h1>Building a Minimal Blockchain in Haskell</h1>
+            
+
+            <div class="info">
+    Posted on October 14, 2017
+    
+</div>
+
+<div class="content-body">
+
+<p>I’ve been wanting to get my hands dirty with the innards of blockchain lately, combine that with my itch to do a project in Haskell, the <strong>bch</strong> project (<strong>b</strong>lock<strong>c</strong>hain in <strong>h</strong>askell) was born. This article will walk you through building a minimal blockchain in Haskell.</p>
+<h1 id="so-what-is-a-blockchain-anyway">So what is a blockchain anyway?</h1>
+According to google:
+<center>
+<img src="https://i.imgur.com/oVCropd.png" />
+</center>
+<p>In layman terms, a blockchain is just an database. Data is stored in ‘blocks’, each block references their own previous block, forming a chain. The data can be anything ranging from transactions (bitcoin) to DNS records (namecoin).</p>
+<h1 id="building-a-minimal-blockchain-in-haskell">Building a minimal blockchain in Haskell</h1>
+<h2 id="defining-our-types">Defining our types</h2>
+<p>Before doing anything, we need to define two data types to facilitate the blockchain. Specifically: <code>Transaction</code> to represent the type of data we want to store, and <code>Block</code> to store a set of said data.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Transaction</span> <span class="fu">=</span> <span class="dt">Transaction</span> {<span class="ot"> from   ::</span> <span class="dt">String</span>   <span class="co">-- Who's paying</span>
+                               ,<span class="ot"> to     ::</span> <span class="dt">String</span>   <span class="co">-- Who's receiving</span>
+                               ,<span class="ot"> amount ::</span> <span class="dt">Float</span>    <span class="co">-- How much are they paying</span>
+                               } <span class="kw">deriving</span> (<span class="dt">Generic</span>, <span class="dt">Show</span>)
+
+<span class="kw">data</span> <span class="dt">Block</span> <span class="fu">=</span> <span class="dt">Block</span> {<span class="ot"> index    ::</span> <span class="dt">Int</span>           <span class="co">-- Index of the block</span>
+                   ,<span class="ot"> txs      ::</span> [<span class="dt">Transaction</span>] <span class="co">-- List of transactions in the block</span>
+                   ,<span class="ot"> hash     ::</span> <span class="dt">String</span>        <span class="co">-- Hash of the block</span>
+                   ,<span class="ot"> prevHash ::</span> <span class="dt">String</span>        <span class="co">-- Prev Hash of the block</span>
+                   ,<span class="ot"> nonce    ::</span> <span class="dt">Maybe</span> <span class="dt">Int</span>     <span class="co">-- Nonce of the block (proof of work)</span>
+                   } <span class="kw">deriving</span> (<span class="dt">Generic</span>, <span class="dt">Show</span>)</code></pre></div>
+<p>Great, we now have the tools to construct a <a href="https://en.bitcoin.it/wiki/Genesis_block">genesis block</a>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">genesisBlock ::</span> <span class="dt">Block</span>
+genesisBlock <span class="fu">=</span> <span class="dt">Block</span> blockIndex blockTxs blockHash prevHash <span class="dt">Nothing</span>
+    <span class="kw">where</span> blockIndex <span class="fu">=</span> <span class="dv">0</span>
+        blockTxs <span class="fu">=</span> [<span class="dt">Transaction</span> <span class="st">&quot;heaven&quot;</span> <span class="st">&quot;kendrick&quot;</span> <span class="dv">15</span>]
+        blockHash <span class="fu">=</span> <span class="st">&quot;&quot;</span>
+            prevHash <span class="fu">=</span> <span class="st">&quot;000000000000000000000000000000000&quot;</span></code></pre></div>
+<h2 id="blockchain-tools">Blockchain tools</h2>
+<p>Now that we know how to construct a <code>Block</code>, the next step is to write a couple of functions to make our blockchain more complete. First up is a function that adds a new <code>Transaction</code> to the <code>Block</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">blockAddTx ::</span> <span class="dt">Block</span> <span class="ot">-&gt;</span> <span class="dt">Transaction</span> <span class="ot">-&gt;</span> <span class="dt">Block</span>
+blockAddTx (<span class="dt">Block</span> i ts h p n) t <span class="fu">=</span> <span class="dt">Block</span> i (ts <span class="fu">++</span> [t]) h p n</code></pre></div>
+<p>We also need a function that <em>hashes</em> the <code>Block</code>, giving the block an ID to be referenced in the future <code>Block</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import           </span><span class="dt">Data.ByteString.UTF8</span>   (fromString, toString)
+
+<span class="ot">hashBlock ::</span> <span class="dt">Block</span> <span class="ot">-&gt;</span> <span class="dt">String</span>
+hashBlock (<span class="dt">Block</span> blockIndex blockTxs blockHash prevHash _) <span class="fu">=</span> toString <span class="fu">$</span> Base16.encode digest
+    <span class="kw">where</span> blockTxStr <span class="fu">=</span> foldr ((<span class="fu">++</span>) <span class="fu">.</span> show) <span class="st">&quot;&quot;</span> blockTxs
+          ctx <span class="fu">=</span> SHA256.updates SHA256.init <span class="fu">$</span> fmap fromString [blockTxStr, prevHash]
+          digest <span class="fu">=</span> SHA256.finalize ctx</code></pre></div>
+<p>Lastly, a function which <em>mines</em> the <code>Block</code>, proving that some work has been done on the <code>Block</code>. I opted for a simple proof-of-work algorithm that just checks if the SHA256 of the <code>Block</code> + some <code>nonce</code> starts with a ‘0’. It is just an educational blockchain after all.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import qualified</span> <span class="dt">Crypto.Hash.SHA256</span>     <span class="kw">as</span> <span class="dt">SHA256</span>
+<span class="kw">import qualified</span> <span class="dt">Data.ByteString.Base16</span> <span class="kw">as</span> <span class="dt">Base16</span>
+
+<span class="ot">mineBlock ::</span> <span class="dt">Block</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Block</span>
+mineBlock b<span class="fu">@</span>(<span class="dt">Block</span> i t _ p _) n <span class="fu">=</span> <span class="kw">case</span> head pow <span class="kw">of</span>
+                                    <span class="ch">'0'</span> <span class="ot">-&gt;</span> <span class="dt">Block</span> i t blockHash p (<span class="dt">Just</span> n)
+                                    _   <span class="ot">-&gt;</span> mineBlock b (n <span class="fu">+</span> <span class="dv">1</span>)
+    <span class="kw">where</span> blockHash <span class="fu">=</span> hashBlock b
+          ctx <span class="fu">=</span> SHA256.updates SHA256.init (fmap fromString [blockHash, show n, p])
+          pow <span class="fu">=</span> toString <span class="fu">.</span> Base16.encode <span class="fu">$</span> SHA256.finalize ctx <span class="co">-- proof of work</span></code></pre></div>
+<p>This should give you enough tools to play around with your blocks in <code>ghci</code>.</p>
+<p><img src="https://i.imgur.com/1mlkP6P.png" /></p>
+<h1 id="playable-rest-api">Playable REST API</h1>
+<p>Of course, playing around with the blockchain <code>ghci</code> isn’t that sexy, so I wrote a a REST API for the blockchain to interface with it.</p>
+<p><img src="https://i.imgur.com/3ijlTcL.png" /></p>
+<p>The hardest bit was probably wrapping up the <code>Blockchain</code> state into a <code>State</code> monad (as I didn’t want to use a database). Luckily for me there was a <a href="https://stackoverflow.com/questions/31952792/how-do-i-use-a-persistent-state-monad-with-spock">reference</a> guide on stackoverflow.</p>
+<p>Anyways, thats about it, you can <a href="https://github.com/kendricktan/bch/">view <strong>bch</strong>’s source code here</a>, and the <a href="https://bitcoin.org/bitcoin.pdf">original bitcoin whitepaper here</a>.</p>
+
+</div>
+
+
+            
+                <hr>
+                <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+            
+        </div>
+        <div class="footer">
+            <div class="footer-lt">
+                <a href="https://github.com/kendricktan"><i class="fa fa-github"></i></a>                
+                <a href="https://twitter.com/kendricktrh"><i class="fa fa-twitter"></i></a>                
+                <a href="https://www.linkedin.com/in/tankendrick/"><i class="fa fa-linkedin"></i></a>
+            </div>
+            <div class="footer-rt" style="text-align: right;">
+                kendricktan0814 at gmail.com<br />
+                Made with <a href="https://jaspervdj.be/hakyll/">hakyll</a>
+            </div>
+        </div>
+    </body>
+</html>

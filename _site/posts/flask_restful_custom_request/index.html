@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.55">
+        <meta name="keywords" content="Linux,ChromeOS,HTML,CSS,JavaScript,AWS,Programming,Software Engineering,Software Development,Computer Science,UIUC,CTO">
+        <meta name="description" content="Chief Technology Officer, Computer Scientist, Engineer, Technologist, Linux User, UIUC Alumnus" />
+        
+        <title>Msgpack in Flask-RESTful | Kendrick Tan</title>
+        
+        <link href="https://fonts.googleapis.com/css?family=Lato|PT+Serif" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/syntax.css" />
+        <link rel="stylesheet" type="text/css" href="../../assets/font-awesome/css/font-awesome.min.css" />
+        <link href="../../images/fav.png" rel="shortcut icon">
+        <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+        
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../../">Kendrick Tan</a>
+            </div>
+            <div id="navigation">
+                <a href="../../">Home</a>
+                <a href="../../about/">About</a>
+                <a href="https://goo.gl/hU5G97">Resume</a>
+            </div>
+        </div>
+
+        <div id="content">
+            
+                <h1>Msgpack in Flask-RESTful</h1>
+            
+
+            <div class="info">
+    Posted on January  8, 2017
+    
+</div>
+
+<div class="content-body">
+
+<h2 id="link-to-the-boilerplate-project"><strong><a href="https://github.com/kendricktan/flaskrestful-custom-request">Link to the boilerplate project</a></strong></h2>
+<p>Recently I’ve been building a RESTful microservice, one the the requirements that the microservice has is that it has <a href="http://msgpack.org/index.html">MessagePack</a> support (it’s like JSON but smaller). <a href="https://flask.pocoo.org">Flask</a> doesn’t support MessagePack by default, and the documentation on extending <a href="https://flask.pocoo.org">Flask</a> for custom <code>Request</code> types was lacking at the time of this writing, and as such I’ve decided to write a post to serve as a guideline to whomever who’s running into the same issue.</p>
+<p>I’ll be using <a href="https://flask.pocoo.org">Flask</a> and <a href="http://flask-restful-cn.readthedocs.io/en/0.3.4/">Flask-RESTful</a> in this tutorial.</p>
+<h2 id="extending-flasks-request-class"><strong>Extending Flask’s Request Class</strong></h2>
+<p>Unfortunately since <code>Flask-RESTful</code> inherits its <code>Request</code> parsing from <code>Flask</code>, we can’t just extend on <code>Flask-RESTful</code> and expect it to be able to parse our custom <code>Request</code> type. As such, we’ll need to subclass <code>Flask</code> to specify our custom <code>Request</code> class (which is also a subclass of <code>Flask</code>’s <code>Request</code> class).</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> flask <span class="im">import</span> Flask
+<span class="im">from</span> flask <span class="im">import</span> Request, _request_ctx_stack
+
+<span class="kw">class</span> RequestWithMsgPack(Request):
+    <span class="co">&quot;&quot;&quot;</span>
+<span class="co">    Extending on Flask's Request class to support msgpack mimetype</span>
+<span class="co">    &quot;&quot;&quot;</span>
+    <span class="cf">pass</span>
+
+<span class="kw">class</span> FlaskWithMsgPackRequest(Flask):
+    <span class="co">&quot;&quot;&quot;</span>
+<span class="co">    Extending on Flask to specify the usage of our custom Request class</span>
+<span class="co">    &quot;&quot;&quot;</span>
+    request_class <span class="op">=</span> RequestWithMsgPack</code></pre></div>
+<h2 id="adding-messagepack-parsing-functionality"><strong>Adding MessagePack Parsing Functionality</strong></h2>
+<p>Next thing we need to do is write a custom <code>MessagePack</code> parser in our custom <code>RequestWithMsgPack</code> class.</p>
+<p><em>Important</em>: Note down the function used to parse the custom <code>Request</code> class you have in mind, in our case its the <code>def msgpack(...)</code> function. This will be discussed later on.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> msgpack
+<span class="im">from</span> flask <span class="im">import</span> Flask
+<span class="im">from</span> flask <span class="im">import</span> Request, _request_ctx_stack
+<span class="im">from</span> flask.wrappers <span class="im">import</span> _get_data
+<span class="im">from</span> werkzeug.exceptions <span class="im">import</span> BadRequest
+
+
+<span class="kw">class</span> RequestWithMsgPack(Request):
+    <span class="co">&quot;&quot;&quot;</span>
+<span class="co">    Extending on Flask's Request class to support msgpack mimetype</span>
+<span class="co">    &quot;&quot;&quot;</span>
+
+    <span class="at">@property</span>
+    <span class="kw">def</span> is_msgpack(<span class="va">self</span>):
+        <span class="co">&quot;&quot;&quot;</span>
+<span class="co">        Checks if request is msgpack type or not.</span>
+<span class="co">        &quot;&quot;&quot;</span>
+        mt <span class="op">=</span> <span class="va">self</span>.mimetype
+        <span class="cf">return</span> mt.startswith(<span class="st">'application/'</span>) <span class="kw">and</span> mt.endswith(<span class="st">'msgpack'</span>)
+
+    <span class="kw">def</span> msgpack(<span class="va">self</span>, force<span class="op">=</span><span class="va">False</span>, silent<span class="op">=</span><span class="va">False</span>):
+        <span class="co">&quot;&quot;&quot;</span>
+<span class="co">        </span><span class="al">NOTE</span><span class="co">: This function name needs to be the same name specified on the</span>
+<span class="co">        'location' variable of the request parser. e.g.</span>
+<span class="co">        parser.add_argument('data', location='msgpack') `location needs to have the same</span>
+<span class="co">                                                        name as the callable function</span>
+<span class="co">        Parses the incoming request data and decodes it from msgpack to python</span>
+<span class="co">        __dict__ type. By default this function will return `None` if the mimetype</span>
+<span class="co">        is not `application/msgpack` but can be overridden by the ``force`` parameter.</span>
+<span class="co">        If parsing fails the</span>
+<span class="co">        :param force: if set to ``True`` the mimetype is ignored</span>
+<span class="co">        :param silent: if set to ``True`` this method will fail silently and return ``None``</span>
+<span class="co">        &quot;&quot;&quot;</span>
+        <span class="cf">if</span> <span class="kw">not</span> (force <span class="kw">or</span> <span class="va">self</span>.is_msgpack):
+            <span class="cf">return</span> <span class="va">None</span>
+
+        <span class="co"># Convert to utf-8 by default</span>
+        request_charset <span class="op">=</span> <span class="va">self</span>.mimetype_params.get(<span class="st">'charset'</span>, <span class="st">'utf-8'</span>)
+
+        <span class="cf">try</span>:
+            data <span class="op">=</span> _get_data(<span class="va">self</span>, <span class="va">False</span>)
+            rv <span class="op">=</span> msgpack.unpackb(data, encoding<span class="op">=</span>request_charset)
+
+        <span class="cf">except</span> <span class="pp">ValueError</span> <span class="im">as</span> e:
+            <span class="cf">if</span> silent:
+                <span class="cf">return</span> <span class="va">None</span>
+            <span class="cf">else</span>:
+                rv <span class="op">=</span> <span class="va">self</span>.on_msgpack_loading_failed(e)
+
+        <span class="cf">return</span> rv
+
+    <span class="kw">def</span> on_msgpack_loading_failed(<span class="va">self</span>, e):
+        <span class="co">&quot;&quot;&quot;</span>
+<span class="co">        Called if decoding of msgpack data failed</span>
+<span class="co">        &quot;&quot;&quot;</span>
+        ctx <span class="op">=</span> _request_ctx_stack.top
+
+        <span class="cf">if</span> ctx <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="kw">and</span> ctx.app.config.get(<span class="st">'DEBUG'</span>, <span class="va">False</span>):
+            <span class="cf">raise</span> BadRequest(<span class="st">'Failed to decode msgpack object: </span><span class="sc">{0}</span><span class="st">'</span>.<span class="bu">format</span>(e))
+
+        <span class="cf">raise</span> BadRequest()
+
+<span class="kw">class</span> FlaskWithMsgPackRequest(Flask):
+    <span class="co">&quot;&quot;&quot;</span>
+<span class="co">    Extending on Flask to specify the usage of our custom Request class</span>
+<span class="co">    &quot;&quot;&quot;</span>
+    request_class <span class="op">=</span> RequestWithMsgPack</code></pre></div>
+<h2 id="using-messagepack-parsing-in-flask-restful-routes"><strong>Using MessagePack Parsing in Flask-RESTful Routes</strong></h2>
+<p>Remember the notice from before to note down the function used to parse the custom <code>Request</code> class? It’ll now be demonstrated on <code>Flask-RESTful</code>’s <code>Router</code>.</p>
+<p>To invoke our custom <code>Request</code> class in <code>Flask-RESTful</code>, we need specify the name of our function defined above as the <code>location</code> parameter in the <code>RequestParser</code> (<strong>line 14</strong>). For example, if we renamed our <code>msgpack</code> function above to <code>custom_msgpack</code>, then instead of <code>location='msgpack'</code>, it’ll be <code>location='custom_msgpack</code> on <strong>line 14</strong>.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">class</span> HelloMsgPack(Resource):
+    <span class="co">&quot;&quot;&quot;</span>
+<span class="co">    Class containing our endpoints</span>
+<span class="co">    &quot;&quot;&quot;</span>
+
+    <span class="kw">def</span> get(<span class="va">self</span>):
+        <span class="cf">return</span> {<span class="st">'hello'</span>: <span class="st">'You sent a GET request'</span>}
+
+    <span class="kw">def</span> post(<span class="va">self</span>):
+        parse <span class="op">=</span> reqparse.RequestParser()
+        <span class="co"># Important: define your 'location' to whatever function you</span>
+        <span class="co"># defined in your custom Request class</span>
+        parse.add_argument(<span class="st">'data'</span>, location<span class="op">=</span><span class="st">'msgpack'</span>, <span class="bu">help</span><span class="op">=</span><span class="st">'data in msgpack form'</span>, required<span class="op">=</span><span class="va">True</span>)
+
+        args <span class="op">=</span> parse.parse_args()
+
+        <span class="cf">return</span> {<span class="st">'Received data'</span>: args[<span class="st">'data'</span>]}</code></pre></div>
+<h2 id="putting-them-together"><strong>Putting them together</strong></h2>
+<p>Since we’ve just subclasses <code>Flask</code> and <code>Flask-RESTful</code>, the way they’re used is still the same, just with added functionality.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> flask_restful <span class="im">import</span> Api
+
+app <span class="op">=</span> FlaskWithMsgPackRequest(<span class="va">__name__</span>)
+api <span class="op">=</span> Api(app)
+
+api.add_resource(HelloMsgPack, <span class="st">'/'</span>)
+
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:
+    app.run(debug<span class="op">=</span><span class="va">False</span>)</code></pre></div>
+<h2 id="final-thoughts"><strong>Final Thoughts</strong></h2>
+<p>I’ve tried to keep this tutorial as simple as possible and omitted the <code>Response</code> of <code>MessagePack</code> type objects as it is well documented at the time of writing. The <a href="https://github.com/kendricktan/flaskrestful-custom-request">boilerplate project</a> does contain examples on how to write custom <code>Response</code> classes if a reference is needed.</p>
+
+</div>
+
+
+            
+                <hr>
+                <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+            
+        </div>
+        <div class="footer">
+            <div class="footer-lt">
+                <a href="https://github.com/kendricktan"><i class="fa fa-github"></i></a>                
+                <a href="https://twitter.com/kendricktrh"><i class="fa fa-twitter"></i></a>                
+                <a href="https://www.linkedin.com/in/tankendrick/"><i class="fa fa-linkedin"></i></a>
+            </div>
+            <div class="footer-rt" style="text-align: right;">
+                kendricktan0814 at gmail.com<br />
+                Made with <a href="https://jaspervdj.be/hakyll/">hakyll</a>
+            </div>
+        </div>
+    </body>
+</html>
