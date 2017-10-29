@@ -1,29 +1,24 @@
-#!/bin/bash
-# Temporarily store uncommited changes
-git stash
+#!/usr/bin/env bash
+set -eo pipefail
 
-# Verify correct branch
-git checkout develop
+# Push our latest revision to GitHub
+git push origin hakyll
 
-# Build new files
-stack exec site clean
-stack exec site build
+# Clean rebuild
+stack build
+stack exec site rebuild
 
-# Get previous files
-git fetch --all
-git checkout -b master --track origin/master
+# Create deploy environment inside of .deploy directory
+mkdir .deploy
+cd .deploy
+git init
+git remote add origin git@github.com:kendricktan/kendricktan.github.io.git
 
-# Overwrite existing files with new files
-cp -a _site/. .
+# Add built site files
+cp -r ../_site/* .
+git add .
+git commit -m 'Publish'
+git push -f origin master
 
-# Commit
-git add -A
-git commit -m "Publish."
-
-# Push
-git push origin master:master
-
-# Restoration
-git checkout develop
-git branch -D master
-git stash pop
+# Cleanup .deploy directory after a successful push
+cd .. && rm -rf .deploy

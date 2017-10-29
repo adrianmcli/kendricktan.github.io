@@ -59,6 +59,11 @@ target/
 # Site files
 output/
 .vscode/
-_cache/
-_site/
 .stack-work/
+_site/
+_cache/
+*~
+*.swp
+\#*
+
+.deploy
