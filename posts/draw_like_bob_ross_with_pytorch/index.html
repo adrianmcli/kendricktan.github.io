@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.55">
+        <meta name="keywords" content="Linux,ChromeOS,HTML,CSS,JavaScript,AWS,Programming,Software Engineering,Software Development,Computer Science,UIUC,CTO">
+        <meta name="description" content="Chief Technology Officer, Computer Scientist, Engineer, Technologist, Linux User, UIUC Alumnus" />
+        
+        <title>Draw Like Bob Ross (With Pytorch!) | Kendrick Tan</title>
+        
+        <link href="https://fonts.googleapis.com/css?family=Lato|PT+Serif" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/syntax.css" />
+        <link rel="stylesheet" type="text/css" href="../../assets/font-awesome/css/font-awesome.min.css" />
+        <link href="../../images/fav.png" rel="shortcut icon">
+        <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+        
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../../">Kendrick Tan</a>
+            </div>
+            <div id="navigation">
+                <a href="../../">Home</a>
+                <a href="../../about/">About</a>
+                <a href="https://goo.gl/hU5G97">Resume</a>
+            </div>
+        </div>
+
+        <div id="content">
+            
+                <h1>Draw Like Bob Ross (With Pytorch!)</h1>
+            
+
+            <div class="info">
+    Posted on April  5, 2017
+    
+</div>
+
+<div class="content-body">
+
+<p><em>I’ve been playing around with <a href="http://ufldl.stanford.edu/tutorial/unsupervised/Autoencoders/">autoencoders</a>, and have been fully fascinated with the idea of using one in a cool, fun project, and so <a href="https://github.com/kendricktan/drawlikebobross"><strong>drawlikebobross</strong></a> was born.</em></p>
+<hr />
+<h1 id="what-is-drawlikebobross">What is drawlikebobross?</h1>
+<p><a href="https://github.com/kendricktan/drawlikebobross"><strong>drawlikebobross</strong></a> aims to turn a patched color photo into a Bob Ross styled photo, like so:</p>
+<center>
+<img src="https://i.imgur.com/9rdXfdM.png" />
+</center>
+<p>Basically turning rough color patches into an image that <em>(hopefully)</em> looks like it could be drawn from Bob Ross.</p>
+<p>It also includes a nice little web app for you to test things out :-)</p>
+<hr />
+<h1 id="how-we-do-what-we-do">How we do what we do</h1>
+<h3 id="scrapping-data">Scrapping Data</h3>
+<p>Before we start diving into anything, we first need data. Fortunately, a quick google search on <em>“Bob Ross Datasets”</em> results in this website: <a href="http://www.twoinchbrush.com/">twoinchbrush</a>.</p>
+<p>Whats so great about this website is that it lists all its Bob Ross images in a nice, scrapable format:</p>
+<pre><code>http://www.twoinchbrush.com/images/painting1.png
+http://www.twoinchbrush.com/images/painting2.png
+http://www.twoinchbrush.com/images/painting3.png
+http://www.twoinchbrush.com/images/paintingN.png</code></pre>
+<p>A quick and easy <a href="https://github.com/kendricktan/drawlikebobross/blob/master/scrapper.sh">shell script</a> finishes the job.</p>
+<h3 id="preprocessing-data">Preprocessing Data</h3>
+<p>As our challenge here is to convert color patches into Bob Ross styled drawings, I’ve decided to use <a href="https://spin.atomicobject.com/2015/05/26/mean-shift-clustering/">mean shift filtering</a> to smoothen the images in order to resemble color patches as inputs, and the original image as the output:</p>
+<center>
+<img src="https://i.imgur.com/IdbIQGt.png" />
+</center>
+<p>To minimize the training time, I’ve preprocessed the bulk of images into smoothen images and stored them in a <a href="http://www.h5py.org/">h5 format</a>. This allows me to rapidly test different neural network architectures without having to preprocessed the data during training time, which is a huge time saver.</p>
+<h3 id="neural-network-architecture">Neural Network Architecture</h3>
+<p>The network architecture I’m using is called an <em>Adversarial Autoencoder</em>, or <em>aae</em> for short. You can read more about them <a href="http://hjweide.github.io/adversarial-autoencoders">here</a>, original paper <a href="https://arxiv.org/abs/1511.05644">here</a></p>
+<p>TL;DR: <em>“The idea I find most fascinating in this paper is the concept of mapping the encoder’s output distribution q(z|x) to an arbitrary prior distribution p(z) using adversarial training (rather than variational inference).” - Hendrik J. Weideman</em></p>
+<center>
+<p><strong>AAE Figure</strong></p>
+<img src="http://www.inference.vc/content/images/2016/01/Screen-Shot-2016-01-08-at-14-48-25.png" />
+</center>
+<h3 id="feeding-data-into-our-model-pytorch">Feeding Data Into Our Model + Pytorch</h3>
+<p>So we want color patches coming in, and Bob Ross styled images coming out, the process should now look like:</p>
+<center>
+<img src="https://i.imgur.com/hyWoQ18.png" />
+</center>
+<p>I’ve chosen to use <a href="http://pytorch.org">pytorch</a> to implement the model in because I’ve been using it tons in my <a href="http://popgun.ai">work</a>, as it has a super pleasant and consistent API (<em>looking at you tensorflow</em>), and I just feel like my productivity has increase tenfolds.</p>
+<p>The <a href="https://github.com/kendricktan/drawlikebobross/tree/master/aae">model pipeline</a> has also been abstracted into 4 components:</p>
+<ul>
+<li><strong>models.py</strong>: Architecture of the Neural Network</li>
+<li><strong>loader.py</strong>: Dataloader</li>
+<li><strong>trainer.py</strong>: The training procedure for the Network</li>
+<li><strong>train.py</strong>: Run this file to initiate training</li>
+</ul>
+<p>This way, if I wanted to say change the architecture of the network, all I need to do is edit <strong>models.py</strong> and <strong>trainer.py</strong>, and we’re good to go!</p>
+<h3 id="training">Training</h3>
+<p>Now the longer we train, the better the network gets at Bob Rossifying our color patches:</p>
+<center>
+<img src="https://thumbs.gfycat.com/DefenselessEminentKookaburra-size_restricted.gif" />
+</center>
+<p>Since I’m using a thinkpad t460s with a shitty GPU, I rented a g2 on AWS and chucked the model there for around a day or so. (Got to around 2.5k epochs).</p>
+<hr />
+<h1 id="final-thoughts">Final thoughts</h1>
+<p>I had a ton of fun making this lil project, if machine learning interests you, I would highly recommend doing a small weekend project like so.</p>
+<p>Also, did I mention that the project has a web UI to interact with the model? ;-)</p>
+<div class="figure">
+<img src="https://i.imgur.com/FWTPNJY.png" />
+
+</div>
+
+</div>
+
+
+            
+                <hr>
+                <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+            
+        </div>
+        <div class="footer">
+            <div class="footer-lt">
+                <a href="https://github.com/kendricktan"><i class="fa fa-github"></i></a>                
+                <a href="https://twitter.com/kendricktrh"><i class="fa fa-twitter"></i></a>                
+                <a href="https://www.linkedin.com/in/tankendrick/"><i class="fa fa-linkedin"></i></a>
+            </div>
+            <div class="footer-rt" style="text-align: right;">
+                kendricktan0814 at gmail.com<br />
+                Made with <a href="https://jaspervdj.be/hakyll/">hakyll</a>
+            </div>
+        </div>
+    </body>
+</html>
