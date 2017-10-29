@@ -58,5 +58,7 @@ target/
 
 # Site files
 output/
-.vscode/*
-.stack-work/*
+.vscode/
+_cache/
+_site/
+.stack-work/
