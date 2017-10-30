@@ -16,6 +16,7 @@ git remote add origin git@github.com:kendricktan/kendricktan.github.io.git
 
 # Add built site files
 cp -r ../_site/* .
+echo "kndrck.co" >> CNAME
 git add .
 git commit -m 'Publish'
 git push -f origin master
