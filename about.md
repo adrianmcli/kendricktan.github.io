@@ -3,8 +3,9 @@ title: About
 ---
 
 <div class="content-body">
+Hi! My name is Kendrick. I'm a software developer who has a strong preference for functional languages as programming in this paradigm has helped me strive towards correctness and robustness.
 
-Hi! My name is Kendrick. I'm currently doing a Bachelors of IT at [Queensland University of Technology](www.qut.edu.au). I'm a big functional programming fan and I think types should be a mandatory feature in every language. I'm also an enthusiast in the machine learning and blockchain space. In my spare time I like to work on my side projects (which can be found on <a href="https://github.com/kendricktan">GitHub</a>), play squash, and socialize (occasionally). I'm currently running [Ubuntu](https://www.ubuntu.com/) simply because of the convinience and the community, but I would really like to switch to [NixOS](https://nixos.org/). My languages of choice are [Haskell](https://www.haskell.org/), and [Python](https://www.python.org/), I also prefer to code using [Vim](http://www.vim.org/) and [Visual Studio Code](https://code.visualstudio.com/).
+My personal development includes reading papers on <a href="http://arxiv.org/">arxiv.org</a> to keep me up to date with the latest trends on machine learning, contributing to the blockchain community by writing <a href="https://github.com/ZencashOfficial/zencashjs.git">open sourced libraries</a>, as well as maintaining this technical blog.
 
-I enjoy meeting people from different backgrounds as they often surprise me with interesting perspectives on things, so feel free to send me an<a href="mailto:c.charukiewicz@gmail.com"></i>&nbsp;email</a> if you would like to chat just about anything.
+Feel free to send me an <a href="mailto:kendricktan0814@gmail.com"></i>email</a>. I enjoy emails. And cats. Feel free to follow my <a href="https://www.instagram.com/mr.miso.oz/">cat on instagram</a>.
 </div>
