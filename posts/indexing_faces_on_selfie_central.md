@@ -1,6 +1,7 @@
 ---
 title: Indexing Faces on Selfie Central
 date: 2017-06-18
+author: Kendrick Tan
 disqus: yes
 ---
 

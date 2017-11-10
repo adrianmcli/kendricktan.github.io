@@ -1,6 +1,7 @@
 ---
 title: Tutorial - How to Setup ZENChat
 date: 2017-08-28
+author: Kendrick Tan
 disqus: yes
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Building a Minimal Blockchain in Haskell
 date: 2017-10-14
+author: Kendrick Tan
 disqus: yes
 ---
 

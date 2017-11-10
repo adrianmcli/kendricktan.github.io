@@ -1,6 +1,7 @@
 ---
 title: Rare Pepe Generator
 date: 2017-05-24
+author: Kendrick Tan
 disqus: yes
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Draw Like Bob Ross (With Pytorch!)
 date: 2017-04-05
+author: Kendrick Tan
 disqus: yes
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Msgpack in Flask-RESTful
 date: 2017-01-08
+author: Kendrick Tan
 disqus: yes
 ---
 
