@@ -112,7 +112,7 @@ Max pooling is a very primitive way to do routing as it only attends to the most
 
 Using a novel architecture that mimics the human vision system, Capsule Networks strives for _translation equivariance_ instead of _translation invariance_, allowing it to generalize to a greater degree from different view points with less training data.
 
-You can check out a [barebone implementation of Capsule Network here](https://gist.github.com/kendricktan/9a776ec6322abaaf03cc9befd35508d4), which is just a cleaned up version of [gram.ai's implementaion](https://github.com/gram-ai/capsule-networks.)
+You can check out a [barebone implementation of Capsule Network here](https://gist.github.com/kendricktan/9a776ec6322abaaf03cc9befd35508d4), which is just a cleaned up version of [gram.ai's implementaion](https://github.com/gram-ai/capsule-networks).
 
 ----
 
