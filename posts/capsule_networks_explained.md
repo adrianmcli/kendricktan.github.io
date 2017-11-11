@@ -60,7 +60,7 @@ And if we wanted to compare the object in Figure 1.6 to say the letter 'R', most
 <center><img src="https://thumbs.gfycat.com/PortlyGracefulBichonfrise-size_restricted.gif"/></center>
 <h5 align="center">Figure 1.6: Mental Rotation then realizing it's not 'R'</h5>
 
-We'll explore this idea of imposing a bounding rectangle and performing mental rotation on objects later on.
+We'll explore this idea of imposing a bounding rectangle and performing rotations on objects relative to their coordinates later on.
 
 ## How do Capsule Networks solve these issues?
 
@@ -94,7 +94,23 @@ In [Hinton's Paper](https://arxiv.org/pdf/1710.09829.pdf) he describes that the 
 
 In order to reconstruct the input from a lower dimensional space, the Encoder and Decoder needs to __learn a a good matix representation to relate the relationship between the latent space and the input__, _sounds familiar_?
 
-To summarize, by using the reconstruction loss as a regularizer, the Capsule Network is able to learn a global linear manifold (good relationship) between a whole object and the pose of the object as a matrix of weights via unsupervised learning. As such, the translation invariance is encapsulated in the matrix of weights, and not during neural activity, making the neural network translation equivariance.
+To summarize, by using the reconstruction loss as a regularizer, the Capsule Network is able to learn a global linear manifold between a whole object and the pose of the object as a matrix of weights via unsupervised learning. As such, the _translation invariance_ is encapsulated in the matrix of weights, and not during neural activity, making the neural network _translation equivariance_. Therefore, we are in some sense, performing a 'mental rotation and translation' of the image when it gets multiplied by the global linear manifold!
+
+### Dynamic Routing
+
+Routing is the act of relaying information to another actor who can more effectively process it. ConvNets currently perform routing via pooling layers, most commonly being _max pooling_.
+
+<center><img src="https://qph.ec.quoracdn.net/main-qimg-8afedfb2f82f279781bfefa269bc6a90"/></center>
+<h5 align="center">Figure 3.0: Max Pooling with a 2x2 Kernel and 2 Stride</h5>
+
+Max pooling is a very primitive way to do routing as it only attends to the most active neuron in the pool. Capsule Networks is different as it tries to send the information to the capsule above it that is best at dealing with it.
+
+<center><img src="https://i.imgur.com/Vd9kw7m.png"/></center>
+<h5 align="center">Figure 3.1: Extract from Dynamic Routing Between Capsules <sub>[[4](https://arxiv.org/pdf/1710.09829.pdf)]</sub></h5>
+
+## Conclusion
+
+Using a novel architecture hat mimics the human vision system, Capsule Networks strives for translation equivariance instead of translation invariance, allowing it generalize to a greater degree from different view points with less training data.
 
 ----
 
