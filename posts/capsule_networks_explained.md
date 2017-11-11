@@ -87,7 +87,7 @@ __This gives us complete independence between the viewpoints of the object in a 
 <center><img src="https://i.imgur.com/2fHUQrQ.png"/></center>
 <h5 align="center">Figure 2.2 Extract from Dynamic Routing Between Capsules <sub>[[4](https://arxiv.org/pdf/1710.09829.pdf)]</sub></h5>
 
-In [Hinton's Paper](https://arxiv.org/pdf/1710.09829.pdf) he describes that the Capsule Networks uses a reconstruction loss as a regularization method. __Why is this significant?__
+In [Hinton's Paper](https://arxiv.org/pdf/1710.09829.pdf) he describes that the Capsule Networks use a reconstruction loss as a regularization method. __Why is this significant?__
 
 <center><img src="https://i.imgur.com/eCmc5fR.jpg"></center>
 <h5 align="center">Figure 2.3 Autoencoder Architecture</h5>
