@@ -22,7 +22,7 @@ What does that even mean? Imagine that we had a model that predicts cats. You sh
 <center><img src="https://i.imgur.com/NUQ90C3.png"/></center>
 <h5 align="center">Figure 1.0: Translation Invariance</h5>
 
-What we want to strive for is __translation equivariance__. Whereby you show it an image of a cat rotated 0 degrees, it predicts that it's a cat rotated ~0 degrees. You show it the same image rotated 90 degrees, it predicts that its a cat rotated ~90 degrees.
+What we want to strive for is __translation equivariance__. That means that when you show it an image of a cat rotated 0 degrees, it predicts that it's a cat rotated ~0 degrees. You show it the same image rotated 90 degrees, it predicts that its a cat rotated ~90 degrees.
 
 <center><img src="https://i.imgur.com/eChagPp.png"/></center>
 <h5 align="center">Figure 1.1: Translation Equivariance</h5>
@@ -68,7 +68,7 @@ We'll explore this idea of imposing a bounding rectangle and performing rotation
 
 > You can think of (computer) vision as "Inverse Graphics" - Geoffrey Hinton <sub>[[3](https://youtu.be/rTawFwUvnLE?t=1750)]</sub>
 
-What is _inverse graphics_? Simply put, it's the inverse of how a computer renders a object onto the screen. To go from a mesh object onto pixels on a screen, it takes the pose of the whole object, and multiply it by a transformation matrix. This outputs the pose of the object's part in a lower dimension (2D), which is what we see on our screens.
+What is _inverse graphics_? Simply put, it's the inverse of how a computer renders an object onto the screen. To go from a mesh object onto pixels on a screen, it takes the pose of the whole object, and multiplies it by a transformation matrix. This outputs the pose of the object's part in a lower dimension (2D), which is what we see on our screens.
 
 <center><img src="https://i.imgur.com/DCmDyHl.png"/></center>
 <h5 align="center">Figure 2.0: Computer Graphics Rendering Process (Simplified)</h5>
@@ -78,9 +78,9 @@ So why can't we do the opposite? Get pixels from a lower dimension, multiply it 
 <center><img src="https://i.imgur.com/fOqnQ3C.png"/></center>
 <h5 align="center">Figure 2.1: Inverse Graphics (Proposed)</h5>
 
-Yes we can (on an approximation level)! And by doing that, we can represent the relationship between the object as a whole and the pose of the part as a matrix of weights. And these matrix of weights are __viewpoint invariant__, meaning that however much the pose of the part has changed we can get back the pose of the whole using the same matrix of weights.
+Yes we can (on an approximation level)! And by doing that, we can represent the relationship between the object as a whole and the pose of the part as a matrix of weights. And these matrices of weights are __viewpoint invariant__, meaning that however much the pose of the part has changed we can get back the pose of the whole using the same matrix of weights.
 
-__This gives us complete independence between the viewpoints of the object in a matrix of weights. The translation invariant is now represented in the matrix of weights, and not in the neural activity__.
+__This gives us complete independence between the viewpoints of the object in a matrix of weights. The translation invariance is now represented in the matrix of weights, and not in the neural activity__.
 
 ### Where do we get the matrix of weights to represent the relationship?
 
@@ -92,7 +92,7 @@ In [Hinton's Paper](https://arxiv.org/pdf/1710.09829.pdf) he describes that the 
 <center><img src="https://i.imgur.com/eCmc5fR.jpg"></center>
 <h5 align="center">Figure 2.3 Autoencoder Architecture</h5>
 
-In order to reconstruct the input from a lower dimensional space, the Encoder and Decoder needs to __learn a a good matix representation to relate the relationship between the latent space and the input__, _sounds familiar_?
+In order to reconstruct the input from a lower dimensional space, the Encoder and Decoder need to __learn a good matix representation to relate the relationship between the latent space and the input__, _sounds familiar_?
 
 To summarize, by using the reconstruction loss as a regularizer, the Capsule Network is able to learn a global linear manifold between a whole object and the pose of the object as a matrix of weights via unsupervised learning. As such, the _translation invariance_ is encapsulated in the matrix of weights, and not during neural activity, making the neural network _translation equivariance_. Therefore, we are in some sense, performing a 'mental rotation and translation' of the image when it gets multiplied by the global linear manifold!
 
@@ -110,7 +110,9 @@ Max pooling is a very primitive way to do routing as it only attends to the most
 
 ## Conclusion
 
-Using a novel architecture hat mimics the human vision system, Capsule Networks strives for translation equivariance instead of translation invariance, allowing it generalize to a greater degree from different view points with less training data.
+Using a novel architecture that mimics the human vision system, Capsule Networks strives for _translation equivariance_ instead of _translation invariance_, allowing it to generalize to a greater degree from different view points with less training data.
+
+You can check out a [barebone implementation of Capsule Network here](https://gist.github.com/kendricktan/9a776ec6322abaaf03cc9befd35508d4), which is just a cleaned up version of [gram.ai's implementaion](https://github.com/gram-ai/capsule-networks.)
 
 ----
 
