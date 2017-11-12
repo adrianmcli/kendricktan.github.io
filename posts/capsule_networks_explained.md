@@ -15,16 +15,16 @@ _Assumed Knowledge: [Convolutional Neural Networks](https://ujjwalkarn.me/2016/0
 
 The [Capsule Network](https://arxiv.org/abs/1710.09829) is a new type of neural network architecture conceptualized by [Geoffrey Hinton](http://www.cs.toronto.edu/~hinton/), the motivation behind Capsule Networks is to address some of the short comings of Convolutional Neural Networks (__ConvNets__), which are listed below:
 
-#### Problem 1: ConvNets are Translation Invariance [<sub>[1]</sub>](https://aboveintelligent.com/ml-cnn-translation-equivariance-and-invariance-da12e8ab7049)
+#### Problem 1: ConvNets are Translation Invariant [<sub>[1]</sub>](https://aboveintelligent.com/ml-cnn-translation-equivariance-and-invariance-da12e8ab7049)
 
-What does that even mean? Imagine that we had a model that predicts cats. You show it an image of a cat, it predicts that it's a cat. You show it the same image, _but rotated 90 degrees_, it still thinks that it's a cat.
+What does that even mean? Imagine that we had a model that predicts cats. You show it an image of a cat, it predicts that it's a cat. You show it the same image, _but shifted to the left_, it still thinks that it's a cat _without predicting any additional information_.
 
-<center><img src="https://i.imgur.com/NUQ90C3.png"/></center>
+<center><img src="https://i.imgur.com/mEIUqT8.png"/></center>
 <h5 align="center">Figure 1.0: Translation Invariance</h5>
 
-What we want to strive for is __translation equivariance__. That means that when you show it an image of a cat rotated 0 degrees, it predicts that it's a cat rotated ~0 degrees. You show it the same image rotated 90 degrees, it predicts that its a cat rotated ~90 degrees.
+What we want to strive for is __translation equivariance__. That means that when you show it an image of a cat shifted to the right, it predicts that it's a cat shifted to the right. You show it the same cat but shifted towards the left, it predicts that its a cat shifted towards the left.
 
-<center><img src="https://i.imgur.com/eChagPp.png"/></center>
+<center><img src="https://i.imgur.com/u4ydpQ6.png"/></center>
 <h5 align="center">Figure 1.1: Translation Equivariance</h5>
 
 _Why is this a problem?_ ConvNets are unable to identify the position of one object relative to another, they can only identify if the object exists in a certain region, or not. This results in difficulty correctly identifying objects that have sub-objects that hold positional relationships relative to one another.
@@ -41,7 +41,7 @@ If Capsule Networks do work as proposed, it should be able to identify that the 
 
 #### Problem 2: ConvNets require a _lot_ of data to generalize [<sub>[2]</sub>](https://www.kth.se/social/files/588617ebf2765401cfcc478c/PHensmanDMasko_dkand15.pdf).
 
-In order for the ConvNets to be translation invariance, it has to learn different filters for each different viewpoints, and in doing so it requires a __lot__ of data.
+In order for the ConvNets to be translation invariant, it has to learn different filters for each different viewpoints, and in doing so it requires a __lot__ of data.
 
 #### Problem 3: ConvNets are a bad representation of the human vision system
 
