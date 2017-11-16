@@ -9,6 +9,8 @@ disqus: yes
 
 _Assumed Knowledge: [Convolutional Neural Networks](https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/), [Variational Autoencoders](http://kvfrans.com/variational-autoencoders-explained/)_
 
+__Disclaimer: This article does not cover the mathematics behind Capsule Networks, but rather the intuition and motivation behind them.__
+
 ----
 
 ## What are Capsule Networks and why do they exist?
@@ -27,7 +29,7 @@ What we want to strive for is __translation equivariance__. That means that when
 <center><img src="https://i.imgur.com/u4ydpQ6.png"/></center>
 <h5 align="center">Figure 1.1: Translation Equivariance</h5>
 
-_Why is this a problem?_ ConvNets are unable to identify the position of one object relative to another, they can only identify if the object exists in a certain region, or not. This results in difficulty correctly identifying objects that have sub-objects that hold positional relationships relative to one another.
+_Why is this a problem?_ ConvNets are unable to identify the position of one object relative to another, they can only identify if the object exists in a certain region, or not. This results in difficulty correctly identifying objects that hold spatial relationships between features.
 
 For example, a bunch of randomly assembled face parts will look like a face to a ConvNet, because all the key features are there:
 
