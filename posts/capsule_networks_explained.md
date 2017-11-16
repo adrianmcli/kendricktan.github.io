@@ -89,12 +89,12 @@ __This gives us complete independence between the viewpoints of the object in a 
 <center><img src="https://i.imgur.com/2fHUQrQ.png"/></center>
 <h5 align="center">Figure 2.2 Extract from Dynamic Routing Between Capsules <sub>[[4](https://arxiv.org/pdf/1710.09829.pdf)]</sub></h5>
 
-In [Hinton's Paper](https://arxiv.org/pdf/1710.09829.pdf) he describes that the Capsule Networks use a reconstruction loss as a regularization method. __Why is this significant?__
+In [Hinton's Paper](https://arxiv.org/pdf/1710.09829.pdf) he describes that the Capsule Networks use a reconstruction loss as a regularization method, similiar to how an autoencoder operates. __Why is this significant?__
 
 <center><img src="https://i.imgur.com/eCmc5fR.jpg"></center>
 <h5 align="center">Figure 2.3 Autoencoder Architecture</h5>
 
-In order to reconstruct the input from a lower dimensional space, the Encoder and Decoder need to __learn a good matix representation to relate the relationship between the latent space and the input__, _sounds familiar_?
+In order to reconstruct the input from a lower dimensional space, the Encoder and Decoder needs to __learn a good matix representation to relate the relationship between the latent space and the input__, _sounds familiar_?
 
 To summarize, by using the reconstruction loss as a regularizer, the Capsule Network is able to learn a global linear manifold between a whole object and the pose of the object as a matrix of weights via unsupervised learning. As such, the _translation invariance_ is encapsulated in the matrix of weights, and not during neural activity, making the neural network _translation equivariance_. Therefore, we are in some sense, performing a 'mental rotation and translation' of the image when it gets multiplied by the global linear manifold!
 
