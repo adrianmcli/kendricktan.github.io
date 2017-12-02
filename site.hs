@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
-import           Data.Monoid (mappend)
+import           Data.List             (isInfixOf)
+import           Data.Monoid           (mappend)
 import           Hakyll
-import           Data.List (isInfixOf)
-import           System.FilePath.Posix (splitFileName,takeBaseName
-                                        ,takeDirectory, (</>), replaceDirectory)
+import           System.FilePath.Posix (replaceDirectory, splitFileName,
+                                        takeBaseName, takeDirectory, (</>))
 
 
 --------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ baseRoute = customRoute base
 
 niceBaseRoute :: Routes
 niceBaseRoute = customRoute base
-    where 
+    where
       base ident = takeBaseName (toFilePath ident) </> "index.html"
 
 -- replace url of the form foo/bar/index.html by foo/bar
@@ -40,7 +40,7 @@ removeIndexHtml item = return $ fmap (withUrls removeIndexStr) item
     removeIndexStr :: String -> String
     removeIndexStr url = case splitFileName url of
         (dir, "index.html") | isLocal dir -> dir
-        _                                 -> url
+        _                   -> url
     isLocal :: [Char] -> Bool
     isLocal uri = not (isInfixOf "://" uri)
 
@@ -72,6 +72,13 @@ main = hakyll $ do
     match "css/*" $ do
         route   idRoute
         compile compressCssCompiler
+
+    match "projects.md" $ do
+        route $ niceRoute
+        compile $ pandocCompiler
+            >>= loadAndApplyTemplate "templates/default.html" siteCtx
+            >>= relativizeUrls
+            >>= removeIndexHtml
 
     match (fromList ["about.md", "resume.md"]) $ do
         --route   $ setExtension "html"
