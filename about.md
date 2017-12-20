@@ -3,7 +3,7 @@ title: About
 ---
 
 <div class="content-body">
-Hi! My name is Kendrick. I'm a software developer who has a strong preference for functional languages as programming in this paradigm has helped me strive towards correctness and robustness.
+Hi! My name is Kendrick. I'm a software developer with a strong preference for functional languages as programming in this paradigm has helped me strive towards correctness and robustness.
 
 My personal development includes reading papers on <a href="http://arxiv.org/">arxiv.org</a> to keep me up to date with the latest trends on machine learning, contributing to the blockchain community by writing <a href="https://github.com/ZencashOfficial/zencashjs.git">open sourced libraries</a>, as well as maintaining this technical blog.
 
