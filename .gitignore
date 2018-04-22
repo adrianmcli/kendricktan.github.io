@@ -67,3 +67,5 @@ _cache/
 \#*
 
 .deploy
+
+.cabal-sandbox/
