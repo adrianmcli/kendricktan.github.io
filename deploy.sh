@@ -5,8 +5,8 @@ set -eo pipefail
 git push origin hakyll
 
 # Clean rebuild
-stack build
-stack exec site rebuild
+cabal build
+cabal exec site rebuild
 
 # Create deploy environment inside of .deploy directory
 mkdir .deploy
