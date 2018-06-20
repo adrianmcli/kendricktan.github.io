@@ -71,3 +71,6 @@ _cache/
 .cabal-sandbox/
 
 bin/
+
+*.hi
+*.o
