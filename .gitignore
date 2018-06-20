@@ -69,3 +69,5 @@ _cache/
 .deploy
 
 .cabal-sandbox/
+
+bin/
