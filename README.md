@@ -14,5 +14,6 @@ bin/generate-site rebuild
 bin/generate-site watch
 
 # To deploy
+# Make sure you've built the executable if you've changed site.hs
 ./deploy.sh
 ```
