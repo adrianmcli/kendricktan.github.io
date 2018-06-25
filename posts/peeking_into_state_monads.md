@@ -229,7 +229,7 @@ instance Monad (State s) where
   (>>) a b = a >>= (\_ -> b)
 ```
 
-I'm not going to explain Monads, primarily because I _don't think_ I understand it enough to explain it well. So other than giving you an analogue of how Monads are like containers or a burrito, I'm simply going to tell you that we are defining the Monad instance in order to ultilize the [do notation](https://en.wikibooks.org/wiki/Haskell/do_notation) to have a higher level understanding of how to use the State Monad and why does it even work.
+I'm not going to explain Monads, primarily because I _don't think_ I understand it enough to explain in a way that doesn't fall into the ["Monad Tutorial Fallacy"](https://byorgey.wordpress.com/2009/01/12/abstraction-intuition-and-the-monad-tutorial-fallacy/) zone. So other than giving you an analogue of how Monads are like containers or a burrito, I'm simply going to tell you that we are defining the Monad instance in order to ultilize the [do notation](https://en.wikibooks.org/wiki/Haskell/do_notation) to have a higher level understanding of how to use the State Monad and why does it even work.
 
 ## Put & Get
 
@@ -285,19 +285,6 @@ f = do
 f = get >>= (\x -> return (x + 1))
 ```
 
-### Example 2
-
-```haskell
-f = do
-  put 5
-  x <- get
-  return x
-
--- is equilavent to
-
-f = put 5 >> get >>= (\x -> return x)
-```
-
 To understand what is going on behind the scenes in `get`, we need to take off our imperative programming hat and start thinking in terms of function composition. If we look back to the definition of `(>>=)`:
 
 ```haskell
@@ -321,20 +308,57 @@ from example 1 yields:
                                   in (b, s''))
 ```
 
-Which works out just nicely! Just like high school alegbra!
-
-To get a grasp of how `put :: a -> (State (\_ -> ((), a)))` works, we apply same technique from above to obtain a better sense of what's going on behind the hood. Recall:
+Now, if we apply it to `runState` and supply it with an initial value of `10`:
 
 ```haskell
-f = do put 5       
-       return 10
+-- runState :: State s a -> s -> (a, s)
+-- runState (State f) = f s
 
--- is equilavent
+
+> runState (State (\s -> let (a, s')         = (\s -> (s, s)) s
+>                            (State stateS2) = (\x -> State (\s -> (x + 1, s))) a
+>                            (b, s'')        = (\s -> (x + 1, s)) s'
+>                         in (b, s''))) 10
+
+
+> (\s -> let (a, s') = (\s -> (s, s)) s
+>            (State stateS2) = (\x -> State (\s -> (x + 1, s))) a
+>            (b, s'')        = (\s -> (`x + 1`, s)) s'  -- (x + 1) is done on runtime
+>         in (b, s'')) 10
+
+> (let (a, s') = (\s -> (s, s)) 10) ...
+-- (a, s') = (10, 10)
+
+> (State stateS2) = (\x -> State (\s -> (x + 1, s))) a
+> (State stateS2) = (\x -> State (\s -> (x + 1, s))) 10
+-- (State stateS2) = State (\s -> (10 + 1, s))
+
+> (b, s'') = stateS2 s'
+> (b, s'') = (\s -> (10 + 1, s)) 10
+-- (b, s'') = (11, 10)
+```
+
+Therefore,
+
+```haskell
+-- > runState (get >>= (\x -> return (x + 1))) 10
+-- > (11, 10)
+```
+
+
+### Example 2
+
+```haskell
+f = do
+  put 5  
+  return 10
+
+-- is equilavent to
 
 f = put 5 >> return 10
 ```
 
-Recall that `(>>) a b = a >>= \_ -> b`. The function `\_ -> b` just means that our function ignores the input and just returns us `b`.
+To get a grasp of how `put :: a -> (State (\_ -> ((), a)))` works, we apply same technique from the previous example to obtain a better sense of what's going on behind the hood. Recall that `(>>) a b = a >>= \_ -> b`. The function `\_ -> b` just means that our function ignores the input and just returns us `b`.
 
 We can now replace
 
@@ -348,11 +372,44 @@ this yields us:
 
 (>>=) (State f) g = State (\s -> let (a, s')         = (\_ -> ((), 5)) s                -- a :: ()
                                      (State stateS2) = (\_ -> State (\s -> (10, s))) a  -- Ignores input and returns a State data type
-                                     (b, s'')        = (\s -> (10, s)) s'
+                                     (b, s'')        = stateS2 s'
                                   in (b, s''))
 ```
 
-Which also works out very nicely mathematically! And that is why `get >>= (\x -> ..)` will bind the current state value to `x`, and `put x` will update the state to be `x`.
+Now if we apply `runState` and supplying it with an initial value of `20`, we'll get:
+
+```haskell
+> runState State (\s -> let (a, s')         = (\_ -> ((), 5)) s                -- a :: ()
+>                           (State stateS2) = (\_ -> State (\s -> (10, s))) a  -- Ignores input and returns a State data type
+>                           (b, s'')        = stateS2 s'
+>                       in (b, s'')) 5
+
+> (\s -> let (a, s')         = (\_ -> ((), 5)) s                -- a :: ()
+>            (State stateS2) = (\_ -> State (\s -> (10, s))) a  -- Ignores input and returns a State data type
+>            (b, s'')        = stateS2 s'
+>        in (b, s'')) 20
+
+> (a, s') = (\_ -> ((), 5)) s
+> (a, s') = (\_ -> ((), 5)) 20
+-- (a, s') = ((), 5)
+
+> (State stateS2) = (\_ -> State (\s -> (10, s))) a
+> (State stateS2) = (\_ -> State (\s -> (10, s))) ()
+-- stateS2 = State (\s -> (10, s))
+
+> (b, s'') = stateS2 5
+> (b, s'') = (\s -> (10, s)) 5
+-- (b, s'') = (10, 5)
+```
+
+Therefore,
+
+```haskell
+-- > runState (put 5 >> (return 10)) 20
+-- > (10, 5)
+```
+
+And that is why `get >>= (\x -> ..)` will bind the current value (`a` from `(a, s)` to `x`), and `put x` will update the `s` in `(a, s)` to be the value `x`.
 
 # Conclusion & Summary
 
