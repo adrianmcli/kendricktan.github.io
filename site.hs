@@ -125,5 +125,5 @@ siteCtx =
     constField "github_username" "kendricktan" `mappend`
     constField "linkedin_username" "tankendrick" `mappend`
     constField "twitter_handle" "kendricktrh" `mappend`
-    constField "email" "kendricktan0814 at gmail.com" `mappend`
+    constField "email" "me@kndrck.co" `mappend`
     defaultContext
