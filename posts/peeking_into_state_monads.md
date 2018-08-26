@@ -68,7 +68,7 @@ In functional programming, we like having our cake and eating it too - we want a
 -- Keep track of odd numbers in string format from a list of integers
 stringOdd :: String -> [Integral] -> String
 stringOdd s []       = s
-stringOdd s (x : xs) = countOdd (s ++ $ if odd x then (show x) else "") xs
+stringOdd s (x : xs) = stringOdd (s ++ $ if odd x then (show x) else "") xs
 ```
 
 But this creates a lot of redundency and we can abstract this messy structure using State Monads. The definition of a State Monad is like so:
