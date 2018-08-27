@@ -19,7 +19,7 @@ ledger-cli is a great tool, but because it's a CLI tool, generating interactive 
 
 ## ledger-analytics
 
-[ledger-analytics](https://github.com/kendricktan/ledger-analytics) is my attempt in the problem. Currently the core features it provides are:
+[ledger-analytics](https://github.com/kendricktan/ledger-analytics) is my attempt at the problem. Currently the core features it provides are:
 
 1. A general (interactive) overview of your transactions
 2. Monthly comparison between multiple accounts
