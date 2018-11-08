@@ -20,7 +20,7 @@ An Oracle is, simply put, a "smart contract" that is able to interact with the o
 
 __Example__: Say you're writing a smart contract that needs to retrieve weather data, however your contract can't make arbitrary network requests on-chain. You need something that trustable (all user input aren't) and is able to listen and respond to specific events on the blockchain. The solution: Oracles.
 
-<img src="http://surprizingfacts.com/wp-content/uploads/2017/07/oracle-applications-or-how-to-become-a-useful-smart-contract-geektimes.png"/>
+<img src="https://i.imgur.com/YBrFK7C.png"/>
 
 
 # Building your Oracle

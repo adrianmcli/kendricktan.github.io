@@ -73,23 +73,14 @@ main = hakyll $ do
         route   idRoute
         compile compressCssCompiler
 
-    match "projects.md" $ do
-        route $ niceRoute
-        compile $ pandocCompiler
-            >>= loadAndApplyTemplate "templates/default.html" siteCtx
-            >>= relativizeUrls
-            >>= removeIndexHtml
-
-    match (fromList ["about.md", "resume.md"]) $ do
-        --route   $ setExtension "html"
+    match (fromList ["about.md", "projects.md"]) $ do
         route $ niceBaseRoute
         compile $ pandocCompiler
             >>= loadAndApplyTemplate "templates/default.html" siteCtx
             >>= relativizeUrls
             >>= removeIndexHtml
 
-    match "posts/*" $ do
-        --route $ setExtension "html"
+    match "posts/*.md" $ do
         route $ niceRoute
         compile $ pandocCompiler
             >>= loadAndApplyTemplate "templates/post.html"    siteCtx
@@ -98,29 +89,39 @@ main = hakyll $ do
             >>= relativizeUrls
             >>= removeIndexHtml
 
-    match "index.html" $ do
-        route idRoute
-        compile $ do
-            posts <- recentFirst =<< loadAll "posts/*"
-            let indexCtx =
-                    listField "posts" siteCtx (return posts) `mappend`
-                    siteCtx
-
-            getResourceBody
-                >>= applyAsTemplate indexCtx
-                >>= loadAndApplyTemplate "templates/default.html" indexCtx
-                >>= relativizeUrls
-                >>= removeIndexHtml
+    match "iframe/*.html" $ do
+        route $ niceRoute
+        compile copyFileCompiler
 
     match "templates/*" $ compile templateCompiler
+
+    match "index.md" $ do
+        route $ setExtension "html"
+        compile $ do
+            pandocCompiler
+                >>= loadAndApplyTemplate "templates/default.html" siteCtx
+                >>= relativizeUrls
+    
+    create ["posts/index.html"] $ do
+        route idRoute
+        compile $ do
+            posts <- recentFirst =<< loadAll "posts/*.md"
+            let postsCtx = constField "title" "Posts" `mappend`
+                    listField "posts" siteCtx (return posts) `mappend` siteCtx 
+
+            makeItem ""
+                >>= loadAndApplyTemplate "templates/post-list.html" postsCtx
+                >>= saveSnapshot "content"
+                >>= loadAndApplyTemplate "templates/default.html" postsCtx
+                >>= relativizeUrls
+                >>= removeIndexHtml
 
 --------------------------------------------------------------------------------
 siteCtx :: Context String
 siteCtx =
-    dateField "date" "%B %e, %Y" `mappend`
+    dateField "date" "%Y-%m-%d" `mappend`
     constField "google_analytics_tracking_id" "UA-71060764-2" `mappend`
     constField "disqus_sitename" "kendricktangithubio" `mappend`
-    constField "site_tagline" "I organize matrices so it recognizes cats" `mappend`
     constField "sitewide_title" "Kendrick Tan" `mappend`
     constField "github_username" "kendricktan" `mappend`
     constField "linkedin_username" "tankendrick" `mappend`
