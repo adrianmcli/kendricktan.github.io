@@ -14,11 +14,11 @@ Amongst the scrapped data was all the cities in the world, along with the number
 I thought it would be cool to do a quick visualization of the data, and so I did.
 
 # Most Instagrammed Cities - Heatmap
-## <a href='/iframe/insta_cities_viz_simple'>Full page view</a>.
+### <a href='/iframe/insta_cities_viz_simple'>Click here if the map below doesn't load (full page view)</a>.
 
 Should you wish to play around with the extracted data or create your own visualization, I've made the tools and data available <a href='https://github.com/kendricktan/visualizing-worlds-most-grammed-cities'>here</a>.
 
-<iframe style='width: 100%; height: 500px' src='/iframe/insta_cities_viz_simple'></iframe>
+<iframe style='width: 100%; height: 500px' src='https://kndrck.co/iframe/insta_cities_viz_simple'></iframe>
 
 ## Top 25 Most Instagrammed Cities
 
