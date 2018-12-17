@@ -5,7 +5,7 @@ skip_head_title: true
 ---
 
 <div class="content-body">
-Hi! My name is Kendrick, welcome to my personal website.
+My name is Kendrick, welcome to my personal website.
 
 Professionally I'm a fullstack developer with experience in data science/machine learning, blockchain, and DevOps. I also have a strong preference for functional languages as programming in this paradigm has helped me strive towards correctness and robustness.
 

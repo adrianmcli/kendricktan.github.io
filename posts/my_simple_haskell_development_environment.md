@@ -6,7 +6,7 @@ disqus: yes
 ---
 
 # Background
-When I started developing in Haskell, there were many opinions on what build-tools, what IDE/Text-editor you should use. Each coming with their own pros and cons.
+When I started developing in Haskell, there were many opinions on what build-tools, what IDE/text-editor you should use. Each coming with their own pros and cons.
 
 After playing around with the number of options, I eventually found a setup which _just works_, and would like to share that tool stack with anyone / newcomers who are still undecided on what toolchain they should use.
 
@@ -14,7 +14,7 @@ After playing around with the number of options, I eventually found a setup whic
 For the project building and management side of things, `Nix` and `Cabal` is my main go-to solution.
 
 ## Nix and Cabal
-Nix is a package manager for Linux and Unix systems. (Think `virtualenv` but on Steroids).
+Nix is a package manager for Linux and Unix systems. (Think `virtualenv` but on steroids).
 
 Cabal is a package manager for Haskell, combine that with `Nix` and you'll have next level sandboxing and environment reproducability.
 
@@ -32,9 +32,9 @@ NeoVim is great. It's lightweight, its simple, and it boots up almost instantly.
 
 ## GHCI
 
-<strong>G</strong>lasgow's <strong>H</strong>askell <strong>C</strong>ompiler <strong>I</strong>nteractive is a REPL for Haskell. Just because it's simple doesn't mean its not powerful thought.
+<strong>G</strong>lasgow's <strong>H</strong>askell <strong>C</strong>ompiler <strong>I</strong>nteractive is a REPL for Haskell. Just because it's simple doesn't mean its not powerful though.
 
-With the use of `typeholes` (`_`), `ghci` will able infer the types and assist you in figuring out the problem.
+With the use of `typeholes` (`_`), `ghci` will able infer the types and assist you in solving the problem.
 
 <center>
 <img src='https://i.imgur.com/HiGV517.png'>
