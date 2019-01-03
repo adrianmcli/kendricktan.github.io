@@ -1,61 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=0.55">
-        <meta name="keywords" content="Kendrick Tan,Linux,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development">
-        <meta name="description" content="Machine Learning and Blockchain Enthusiast"/>
-        $if(skip_head_title)$
-        <title>$sitewide_title$</title>
-        $else$
-        <title>$title$ | $sitewide_title$</title>
-        $endif$
-        <link href="https://fonts.googleapis.com/css?family=Lato|PT+Serif" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="/css/default.css" />
-        <link rel="stylesheet" type="text/css" href="/css/syntax.css" />
-        <link rel="stylesheet" type="text/css" href="/assets/font-awesome/css/font-awesome.min.css" />
-        <link href='/images/fav.png' rel='shortcut icon'>
-        $partial("templates/ga.html")$
-    </head>
-    <body>
-        <div id="header">
-            <div id="logo">
-                <a href="/">$sitewide_title$</a>
-            </div>
-            <div id="navigation">
-                <a href="/">Home</a>
-                <a href="/posts/">Posts</a>
-                <a href="/projects/">Projects</a>
-                <a href="https://goo.gl/m2EgR2">Resume</a>
-            </div>
-        </div>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta
+      name="keywords"
+      content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development"
+    />
+    <meta
+      name="description"
+      content="Machine Learning and Blockchain Enthusiast"
+    />
+    $if(skip_head_title)$
+    <title>$sitewide_title$</title>
+    $else$
+    <title>$title$ | $sitewide_title$</title>
+    $endif$
+    <link
+      rel="stylesheet"
+      href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic"
+    />
+    <link
+      rel="stylesheet"
+      href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css"
+    />
+    <link
+      rel="stylesheet"
+      href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css"
+    />
+    <link rel="stylesheet" type="text/css" href="/assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/syntax.css" />
+    <link href="/assets/images/fav.png" rel="shortcut icon" />
+    $partial("templates/ga.html")$
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="/">Home</a></li>
+        <li class="navigation_item"><a href="/posts/">Posts</a></li>
+        <li class="navigation_item"><a href="/projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="/talks/">Talks</a></li>
+      </div>
+    </div>
 
-        <div id="content">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
             $if(skip_body_title)$
             <!-- no title -->
             $else$
-                <h1>$title$</h1>
-            $endif$
-
-            $body$
-
-            $if(disqus)$
-                <hr>
-                $partial("templates/disqus.html")$
-            $endif$
+            <h1>$title$</h1>
+            $endif$ $body$ $if(disqus)$
+            <hr />
+            $partial("templates/disqus.html")$ $endif$
+          </div>
         </div>
-        <div class="footer">
-            <div class="footer-lt">
-                <a href="https://github.com/$github_username$"><i class="fa fa-github"></i></a>                
-                <a href="https://twitter.com/$twitter_handle$"><i class="fa fa-twitter"></i></a>                
-                <a href="https://www.linkedin.com/in/$linkedin_username$/"><i class="fa fa-linkedin"></i></a>
-            </div>
-            <div class="footer-rt" style="text-align: right;">
-                $email$<br/>
-                Made with <a href="https://jaspervdj.be/hakyll/">hakyll</a>
-            </div>
-        </div>
-    </body>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/$github_username$"
+          >github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/$twitter_handle$"
+          >twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/$linkedin_username$/"
+          >linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
 </html>

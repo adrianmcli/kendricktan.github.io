@@ -58,8 +58,8 @@ myStateMonad = do
 State monads were created to represent _stateful computations_ in pure languages like Haskell. Stateful computations are computations which mutates the state of a non-local variable upon certain conditions.
 
 <center>
-    <img src="https://i.imgur.com/HMFQsOL.png"/>
-    <h5>Pure vs stateful functions</h5>
+<img src="https://i.imgur.com/HMFQsOL.png"/>
+<h5>Pure vs stateful functions</h5>
 </center>
 
 In functional programming, we like having our cake and eating it too - we want a pure function that is capable of embedding arbitrary state. When I first started functional programming I often got around this by adding an additional parameter to represent the current 'state' the function was in. E.g.

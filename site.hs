@@ -73,7 +73,11 @@ main = hakyll $ do
         route   idRoute
         compile compressCssCompiler
 
-    match (fromList ["about.md", "projects.md"]) $ do
+    match "iframe/*.html" $ do
+        route $ niceRoute
+        compile copyFileCompiler
+    
+    match (fromList ["about.md", "talks.md", "projects.md"]) $ do
         route $ niceBaseRoute
         compile $ pandocCompiler
             >>= loadAndApplyTemplate "templates/default.html" siteCtx
@@ -88,10 +92,6 @@ main = hakyll $ do
             >>= loadAndApplyTemplate "templates/default.html" siteCtx
             >>= relativizeUrls
             >>= removeIndexHtml
-
-    match "iframe/*.html" $ do
-        route $ niceRoute
-        compile copyFileCompiler
 
     match "templates/*" $ compile templateCompiler
 
@@ -123,8 +123,9 @@ siteCtx =
     constField "google_analytics_tracking_id" "UA-71060764-2" `mappend`
     constField "disqus_sitename" "kendricktangithubio" `mappend`
     constField "sitewide_title" "Kendrick Tan" `mappend`
+    constField "site_name" "kndrck.co" `mappend`
     constField "github_username" "kendricktan" `mappend`
     constField "linkedin_username" "tankendrick" `mappend`
     constField "twitter_handle" "kendricktrh" `mappend`
-    constField "email" "me@kndrck.co" `mappend`
+    constField "email" "me [at] kndrck.co" `mappend`
     defaultContext
