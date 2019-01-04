@@ -57,26 +57,11 @@ directory act f = act $ fromGlob $ f ++ "/**"
 
 main :: IO ()
 main = hakyll $ do
-    match "images/*" $ do
-        route   idRoute
-        compile copyFileCompiler
-
-    match "files/*" $ do
-        route   idRoute
-        compile copyFileCompiler
 
     match "assets/**" $ do
         route   idRoute
         compile copyFileCompiler
 
-    match "css/*" $ do
-        route   idRoute
-        compile compressCssCompiler
-
-    match "iframe/*.html" $ do
-        route $ niceRoute
-        compile copyFileCompiler
-    
     match (fromList ["about.md", "talks.md", "projects.md"]) $ do
         route $ niceBaseRoute
         compile $ pandocCompiler

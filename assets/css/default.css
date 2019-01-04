@@ -44,6 +44,10 @@
   display: inline-block;
 }
 
+a {
+  color: #b33939;
+}
+
 h1 {
   font-size: 2.5rem;
 }
