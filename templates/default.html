@@ -34,6 +34,20 @@
     <link rel="stylesheet" type="text/css" href="/assets/css/syntax.css" />
     <link href="/assets/images/fav.png" rel="shortcut icon" />
     $partial("templates/ga.html")$
+    
+    $if(mathjax)$
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          processEscapes: true,
+        }
+      });
+    </script>    
+    <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full">
+    </script>
+    $endif$
   </head>
   <body>
     <div class="navigation">
