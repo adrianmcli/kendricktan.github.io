@@ -37,7 +37,7 @@ Modulo mathematics is significant in Diffie-Hellman (and cryptography in general
 ## Exponent Rules
 $$
 \begin{align}
-g^{a^b} &= g^{ab} \newline
+{(g^a)}^b &= g^{ab} \newline
 (g^a\ mod\ p)^{b}\ mod\ p &= g^{ab}\ mod\ p \label{eq:exponent_mod_rule}
 \end{align}
 $$
