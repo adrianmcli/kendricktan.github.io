@@ -2,8 +2,11 @@
 title: Talks
 ---
 
-## Why Functional? (QUT Code Network Meetup 2018)
+## Why Functional? (QUT Code Network Meetup 2018 Semester 2)
 - [Slides](https://docs.google.com/presentation/d/1cqev-Dx4BbudGR1MqI3601WyMnp3ialh6WpP7Q-zzWI/edit?usp=sharing)
+
+## Intro To Machine Learning (QUT Code Network Meetup 2018 Semester 1)
+- [GitHub](https://github.com/kendricktan/intro_to_ml)
 
 ## Learn You a PyTorch! (PyCon AU 2017)
 - [Video](https://www.youtube.com/watch?v=ICMsWq7c5Z8)
