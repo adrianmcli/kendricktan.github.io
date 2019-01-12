@@ -40,7 +40,7 @@ $$
 
 __Example__: \\( 9/2 = 4 \\ remainder \\ 1 \\)
 
-We can write the equation as \\(9 = 2⋅4 + 1\\), or as \\(n = kq + r\\).
+We can write the equation as \\(9 = 2⋅4 + 1\\).
 
 ## Modulo Arithmetic
 
@@ -48,7 +48,7 @@ We can write the equation as \\(9 = 2⋅4 + 1\\), or as \\(n = kq + r\\).
 
 Modular arithemtic and the divisor theorem are closely related -- say we have \\(k = 2, q = 7, r = 3\\), plugging those values into \\(n = kq + r\\) gives us \\(n = 17\\). 
 
-This gives us \\(17 = 3 \\ mod \\ 7 \\), which can also be rewritten as  \\( 17 / 7 = 2 \\ remainder \\ 3 \\).
+We can write that as \\(17 = 3 \\ mod \\ 7 \\), or  \\( 17 / 7 = 2 \\ remainder \\ 3 \\).
 
 We can also go backwards:
 
