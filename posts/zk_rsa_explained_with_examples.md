@@ -145,7 +145,7 @@ Say we have message $M$, with public key $Pk$, and secret key $Sk$, we can encry
 1. Generate two randomly large __prime__ numbers \\(p\\), and \\(q\\).
 2. Calculate \\(n = pq\\).
 3. Calculate totient of n \\(ϕ(n) = (p - 1)⋅(q - 1)\\).
-4. Generate _public key_ \\(e\\) that satifies the two constaints:
+4. Generate _public key_ \\(e\\) that satifies the two constraints:
     * \\(3 < e < ϕ(n)\\)
     * \\(gcd(e, ϕ(n)) = 1\\)
 5. Calculate the multiplicative inverse of \\(e, d\\) (this will be the private key) such that \\(ed = 1 \\ mod \\ ϕ(n)\\)
@@ -229,7 +229,7 @@ $$
 
 
 # Conclusion
-
+You don't need to be a math wizard to understand RSA ;-)
 
 # Example
 
