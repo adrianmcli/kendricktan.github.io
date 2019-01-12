@@ -13,24 +13,24 @@ If I wanted to comprehend [zero](https://ethresear.ch/t/zero-knowledge-proofs-st
 
 # Background Maths
 
-## Exponential Rules
+## Exponential Rules ~[1]~
 $$
-\begin{align}
+\begin{align} \label{eq:exponent_rule}
 g^{a-b} &= \dfrac{g^a}{g^b} \newline
 g^{a+b} &= g^a g^b \newline
 {(g^a)}^b &= g^{ab} \newline
-(g^a\ mod\ p)^{b}\ mod\ p &= g^{ab}\ mod\ p \label{eq:exponent_mod_rule}
+(g^a\ mod\ p)^{b}\ mod\ p &= g^{ab}\ mod\ p
 \end{align}
 $$
 
-## Division Theorem
+## Division Theorem ~[2]~
 
 The division theorem gives us a formal way to proof the equivalence relationship between the __divident, divisor, quotient,__ and the __remainder__. i.e.
 
 $$
 \begin{align}
 divident &\equiv quotient \cdot divisor + remainder \newline
-n &\equiv p \cdot q + r
+n &\equiv k \cdot q + r
 \end{align}
 $$
 
@@ -38,33 +38,31 @@ $$
 <img src="https://i.imgur.com/1naLv53.png" />
 </div>
 
-__Example__: ~9/2 = 4~ ~ remainder ~ ~ 1 ~
+__Example__: \\( 9/2 = 4 \\ remainder \\ 1 \\)
 
-We can write the equation as ~9 = 4~ ~ ⋅ ~ ~2 + 1~, or as ~n = pq + r~.
+We can write the equation as \\(9 = 2⋅4 + 1\\), or as \\(n = kq + r\\).
 
 ## Modulo Arithmetic
 
-> ~a = b~ &nbsp; ~ mod ~ &nbsp; ~ p ~ states that ~ a ~ and ~ b ~ both have the same remainder after division with ~ p ~.
+> \\(a = b \\ mod \\ n\\) states that \\(a\\) and \\(b\\) both have the same remainder after division with \\(n\\).
 
-Modular arithemtic and the divisor theorem are closely related -- say we have ~ p = 2, q = 7, r = 3 ~, plugging those values into ~ n = pq + r ~ gives us ~ n = 16 ~. 
+Modular arithemtic and the divisor theorem are closely related -- say we have \\(k = 2, q = 7, r = 3\\), plugging those values into \\(n = kq + r\\) gives us \\(n = 17\\). 
 
-We can rewrite it as ~ 16 = 3~ &nbsp; ~ mod ~ &nbsp; ~ 7 ~. And indeed ~ 16 / 7 = 2 ~ &nbsp; ~ remainder ~ &nbsp; ~ 3 ~.
+This gives us \\(17 = 3 \\ mod \\ 7 \\), which can also be rewritten as  \\( 17 / 7 = 2 \\ remainder \\ 3 \\).
 
 We can also go backwards:
 
-$$
-\begin{align}
-16 &= 1\ mod\ 3 \newline
-16 &= p \cdot 3 + 1
-\end{align}
-$$
+<div class="center">
+\\(17 = 3 \\ mod \\ 7\\) <br/>
+\\(17 = k⋅7 + 3\\)
+</div>
 
 More generally:
 
 $$
 \begin{align}
-n &= r \ mod\ q \newline
-n &= p \cdot q + r
+n &= r \space mod \space q \newline \label{eq:modulo_division_format}
+n &= k ⋅ q + r
 \end{align}
 $$
 
@@ -78,17 +76,17 @@ If one of the numbers in the gcd is a prime number, then the gcd will _always_ b
 
 ## Multiplicative Inverse
 
-> A multiplicative inverse for a number ~ x ~, denoted by ~ x^{-1} ~, is a number when multiplied by ~ x ~ yields the multiplicative identity, ~ 1 ~.
+> A multiplicative inverse for a number \\( x \\), denoted by \\( x^{-1} \\), is a number when multiplied by \\(x\\) yields the multiplicative identity \\(1\\).
 
 <div class="center">
-~ x⋅x^{-1} = 1 ~
+\\(x⋅x^{-1} = 1\\)
 </div>
 
-In modulo arithmetic, only numbers whose ~ gcd(x, n) = 1 ~ has a multiplicative inverse, i.e there exists
+In modulo arithmetic, only numbers whose \\(gcd(x, n) = 1\\) has a multiplicative inverse, i.e there exists
 
 $$
 \begin{align}
-x \cdot x^{-1} = 1\ mod\ n,\ \forall gcd(x, n) = 1 \newline
+x \cdot x^{-1} = 1\ mod\ n,\ \forall gcd(x, n) = 1 \label{eq:multiplicative_inverse_modulus}
 \end{align}
 $$
 
@@ -96,7 +94,7 @@ $$
 
 > In number theory, Euler's totient function counts the positive integers up to a given integer n that are relatively prime to n.
 
-In other words, the totient function (often represented as $\phi$) for number ~ n ~ calculates the number of integers between ~ 2 ~ and ~ n ~ whose gcd is equal to ~ 1 ~.
+In other words, the totient function (often represented as $\phi$) for number \\(n\\) calculates the number of integers between \\(2\\) and \\(n\\) whose gcd is equal to \\(1\\).
 
 More concretely in code:
 
@@ -109,21 +107,27 @@ def totient(n):
     return total
 ```
 
-If ~ n ~ is a prime number, then ~ϕ(n) = n - 1~
+If \\(n\\) is a prime number, then \\(ϕ(n) = n - 1\\).
 
 One important thing to note is that multiplication in the totient function is associative:
 
 $$
 \begin{align}
-\phi(a \cdot b) &= \phi(a) \cdot \phi(b)
+\phi(a \cdot b) &= \phi(a) \cdot \phi(b) \label{eq:totient_multiplication_associative}
 \end{align}
 $$
 
-This will come into use when we calculate ~ ϕ(n)~ where ~ n = pq ~.
+This will come into use when we calculate \\(ϕ(n)\\) where \\(n = pq\\).
 
-## Euler's Theorem
+## Euler's Theorem ~[3]~
 
-> ~a^{ϕ(n)} ≡ 1~ &nbsp; ~ mod ~ &nbsp; ~ n ~, if the gcd between ~ n ~ and ~ a ~ is ~ 1 ~ (a.k.a coprime).
+$$
+\begin{align}
+a^{ϕ(n)} ≡ 1 \space mod \space n \label{eq:eulers_theorem}
+\end{align}
+$$
+
+The following formula above holds true if the gcd between \\(n\\) and \\(a\\) is \\(1\\) (a.k.a coprime).
 
 # RSA
 
@@ -137,27 +141,93 @@ Say we have message $M$, with public key $Pk$, and secret key $Sk$, we can encry
 
 ## Algorithm
 
-1. Generate two randomly large __prime__ numbers ~ p ~, and ~ q ~.
-2. Calculate ~ n = pq ~.
-3. Calculate totient of n ~ ϕ(n) = (p - 1)⋅(q - 1) ~.
-4. Generate _public key_ ~ e ~ that satifies the two constaints:
-    * ~ 1 < e < ϕ(n) ~
-    * ~ gcd(e, ϕ(n)) = 1 ~
-    * NOTE: The two constraints allows step 5 to hold true
-5. Calculate the multiplicative inverse of ~ e ~, ~ d ~ (this will be the private key) such that ~ ed = 1~ &nbsp; ~ mod ~ &nbsp; ~ n ~
-6. The generated public key is ~ (e, n) ~, and the generated private key is ~ (d, n) ~.
-7. ~ m^{e} ~ &nbsp; ~ mod ~ &nbsp; ~ n ~ yields an encrypted message, and ~ m^{ed} ~ &nbsp; ~ mod ~ &nbsp; ~ n ~ yields the decrypted message.
+1. Generate two randomly large __prime__ numbers \\(p\\), and \\(q\\).
+2. Calculate \\(n = pq\\).
+3. Calculate totient of n \\(ϕ(n) = (p - 1)⋅(q - 1)\\).
+4. Generate _public key_ \\(e\\) that satifies the two constaints:
+    * \\(3 < e < ϕ(n)\\)
+    * \\(gcd(e, ϕ(n)) = 1\\)
+5. Calculate the multiplicative inverse of \\(e, d\\) (this will be the private key) such that \\(ed = 1 \\ mod \\ ϕ(n)\\)
+6. The generated public key is \\( (e, n) \\), and the generated private key is \\( (d, n) \\).
+7. Given message \\(m\\), \\( m^{e} \\ mod \\ n \\) yields the encrypted message, and \\( m^{ed} \\ mod \\ n \\) yields the decrypted message.
+    * This is because \\(ed = 1 \\ mod \\ n \\)
+    * Therefore, \\(m^{ed} \\ mod \\ n = m^1 \\ mod \\ n \\), giving us our original message
 
 ## Why RSA Works
 
-### Calculating Modulus &nbsp; ~ n ~
-Our modulus, ~ n ~ is calculated by multiplying the two prime numbers ~ p ~ and ~ q ~. This step sort of acts like a one way function, easy to calculate ~ n ~ given ~ p ~ and ~ q ~, but hard to compute ~ p ~ and ~ q ~ given ~ n ~.
+### Calculating Modulus &nbsp; \\( n \\)
+Our modulus, \\( n \\) is calculated by multiplying the two prime numbers \\( p \\) and \\( q \\). This step sort of acts like a one way function, easy to calculate \\( n \\) given \\( p \\) and \\( q \\), but hard to compute \\( p \\) and \\( q \\) given \\( n \\).
 
-Whats scary to me is that computing the prime factors ~ p ~ and ~ q ~ is only considered a __hard enough__ problem, meaning that if someone found out how to calculate ~ p ~ and ~ q ~ given ~ n ~ with polynomial complexity, all encryption as we know it (e.g. SSL) will break.
+Whats scary to me is that computing the prime factors \\( p \\) and \\( q \\) is only considered a __hard enough__ problem, meaning that if someone found out how to calculate \\( p \\) and \\( q \\) given \\( n \\) with polynomial complexity, all encryption as we know it (e.g. SSL) will break.
 
-__This is essential to RSA's security as given a composite number (~ n ~), it is considered a hard problem to determine the prime factors (~ p ~, ~ q ~)__
+__This is essential to RSA's security as given a composite number (\\( n \\)), it is considered a hard problem to determine the prime factors (\\( p \\), \\( q \\)).__
 
-### Public Key &nbsp; ~ e ~
+### Totient Function &nbsp; \\(ϕ(n)\\)
+
+\\( ϕ(n) = (p - 1)(q - 1) \\ when \\ p,q \\ is \\ prime  \\). This is because the totient of a prime number \\(p\\) is simply \\( p - 1 \\), and that multiplication is associative in the totient function (\\ref{eq:totient_multiplication_associative}\).
+
+### Public Key &nbsp; \\(e\\)
+Public Key \\(e\\) is a number that is randomly chosen between \\( 3 < e < ϕ(n) \\), and has to satisfy \\( gcd(e, ϕ(n)) = 1 \\). We need \\( gcd(e, ϕ(n)) = 1 \\) in order for a multiplicative inverse (our secret key) to exist (\\ref{eq:multiplicative_inverse_modulus}\).
+
+### Secret Key &nbsp; \\(d\\)
+The secret key \\( d \\) is calculated using the formula: \\( d⋅e = 1 \\ mod \\ ϕ(n) \\). This process can be calculated using the extended euclidean algorithm ~[4]~ given parameters \\( e \\ and \\ ϕ(n) \\)
+
+### Why RSA satifies proof of correctness even though the key generation is based on &nbsp; \\(mod \\ ϕ(n)\\) and not \\(mod \\ n\\)
+
+Given message \\(m\\), public key \\(e\\), and secret key \\(d\\).
+
+The encrypt a message we do:
+$$
+\begin{align}
+m^{e} \space mod \space n
+\end{align}
+$$
+And to decrypt said encrypted message, we do:
+$$
+\begin{align}
+m^{ed} \space mod \space n \label{eq:decrypted_message_formula}
+\end{align}
+$$
+Our key generation uses the following formula:
+$$
+\begin{align}
+d \cdot e = 1 \space mod \space \phi(n)
+\end{align}
+$$
+Which can be rewritten as (re: equation \\ref{eq:modulo_division_format}\):
+$$
+\begin{align}
+d \cdot e = k \cdot \phi(n) + 1 \label{eq:modulus_division_substitute}
+\end{align}
+$$
+Substituting equation \\ref{eq:modulus_division_substitute}\ into equation \\ref{eq:decrypted_message_formula}\ yields us:
+$$
+\begin{align}
+m^{k \cdot \phi(n) + 1} \space & mod \space n
+\end{align}
+$$
+Which can be rewritten as (re: exponential rules \\ref{eq:exponent_rule}):
+$$
+\begin{align}
+(m^{\phi(n)})^k \cdot m^k \space & mod \space n
+\end{align}
+$$
+Rewriting using Euler's Theorem (\\(a^{ϕ(n)} = 1 \\ mod \\ n\\), equation \\ref{eq:eulers_theorem}\) gives us:
+$$
+\begin{align}
+(1 \space mod \space n)^k \cdot m^1 \space & mod \space n \newline
+1^k \cdot m^1 \space & mod \space n \newline
+\end{align}
+$$
+And so, we have just proved that RSA satisfies the proof of correctness even though the key generation is based on \\(mod ϕ(n)\\) and not \\(n\\)
+$$
+\begin{align}
+\therefore m^{e \cdot d} \space mod \space n = m^1 \space mod \space n
+\end{align}
+$$
+
+
+# Conclusion
 
 
 # Example
@@ -277,16 +347,11 @@ https://crypto.stackexchange.com/questions/1789/why-is-rsa-encryption-key-based-
 """
 ```
 
+# Conclusion
+
 # References
 
-[Exponent Rules](http://www.math.com/school/subject2/lessons/S2U2L2DP.html)
-
-[Division theorem](https://proofwiki.org/wiki/Division_Theorem)
-
-[Euler's Theorem](https://en.wikipedia.org/wiki/Euler%27s_theorem)
-
-[Multiplicative Inverse](https://en.wikipedia.org/wiki/Multiplicative_inverse)
-
-[Modular Multiplicative Inverse](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse)
-
-[ax = 1 mod m](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse)
+1. [Algebra Basics - Exponents In Depth](http://www.math.com/school/subject2/lessons/S2U2L2DP.html)
+2. [Division Theorem - Proofwiki](https://proofwiki.org/wiki/Division_Theorem)
+3. [Euler's Theorem](https://en.wikipedia.org/wiki/Euler%27s_theorem)
+4. [Extended Euclidean Algorithm](https://en.wikipedia.org/wiki/Extended_euclidean_algorithm)
