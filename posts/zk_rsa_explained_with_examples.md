@@ -348,9 +348,6 @@ https://crypto.stackexchange.com/questions/1789/why-is-rsa-encryption-key-based-
 """
 ```
 
-# Conclusion
-RSA, more like RSA-easy right? :-)
-
 # References
 
 1. [Algebra Basics - Exponents In Depth](http://www.math.com/school/subject2/lessons/S2U2L2DP.html)
