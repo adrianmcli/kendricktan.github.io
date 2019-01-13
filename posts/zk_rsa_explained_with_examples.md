@@ -8,7 +8,7 @@ disqus: yes
 
 # Motivation
 
-> RSA (Rivest-Shamir-Adleman) is one of the first public-key cryptosystems and is widely used for secure data transmission. In such a cryptosystem, the encryption key is public and is different from the descryption key which is kept secret.
+> RSA (Rivest-Shamir-Adleman) is one of the first public-key cryptosystems and is widely used for secure data transmission. In such a cryptosystem, the encryption key is public and is different from the decryption key which is kept secret.
 
 If I wanted to comprehend [zero](https://ethresear.ch/t/zero-knowledge-proofs-starter-pack/4519) [knowledge](https://zkp.science/) [proofs](https://www.zeroknowledge.fm/), then understanding the grand-daddy of public-key cryptosystems is a must.
 
