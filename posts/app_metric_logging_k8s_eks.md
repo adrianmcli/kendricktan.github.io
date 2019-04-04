@@ -102,7 +102,7 @@ spec:
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 80
+    targetPort: 8080
     name: http
   selector:
     app: my-custom-app
@@ -130,7 +130,7 @@ spec:
       - name: my-custom-app-container
         image: <image-url>
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         env:
         - name: APP_NAME
           value: CUSTOM_APP
