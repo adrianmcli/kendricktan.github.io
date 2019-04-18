@@ -2,6 +2,10 @@
 title: Talks
 ---
 
+## Proving Without Revealing - Talk on RangeProofs (Brisbane Ethereum Engineering Group 2019)
+- [Video](https://www.youtube.com/watch?v=6--S5xPHGn8)
+- [Slides](https://docs.google.com/presentation/d/1sZhPXdQMiibuS_jtpPWzV8aTQduMEzHxrcZ4J3eANmY/edit?usp=sharing)
+
 ## Why Functional? (QUT Code Network Meetup 2018 Semester 2)
 - [Slides](https://docs.google.com/presentation/d/1cqev-Dx4BbudGR1MqI3601WyMnp3ialh6WpP7Q-zzWI/edit?usp=sharing)
 
