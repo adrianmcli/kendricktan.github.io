@@ -9,6 +9,11 @@ disqus: yes
 
 I was looking for a new project to work on, stumbled on [Vitalik's HackMD post](https://hackmd.io/@HWeNw8hNRimMm2m2GH56Cw/rJj9hEJTN?type=view), and thought why not? It sounded like fun, and so [heiswap.exchange](https://heiswap.exchange) was born.
 
+## Quicklinks
+
+- [Smart contract deployed on Ropsten](https://ropsten.etherscan.io/address/0xbbbf35a4485992520557ae729e21ba35aab178d7)
+- [Solidity + WebApp Source Code](https://github.com/kendricktan/heiswap-dapp)
+
 # Introduction
 
 Heiswap (黑 swap) is an Ethereum mixer that allows users to 'wash' their ETH in a confidential manner (i.e. who the sender sends money to is hidden). At this point in time (3rd July 2019), Heiswap is only able to mask the link between senders and their corresponding recipients, and requires participants to send ETH in fixed denominations.
