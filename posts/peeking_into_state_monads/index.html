@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>Peeking Into State Monads | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>Peeking Into State Monads</h1>
+             <div class="info">
+    Posted on 2018-06-20    
+    
+        by Kendrick tan
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<h1 id="prelude">Prelude</h1>
+<p><a href="https://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-State-Lazy.html">State monads</a>, introduced to me during the <a href="https://github.com/data61/fp-course">data61 functional programming course</a> was one of my most memorable encounter with a monad. This was mainly because things only started to clicked and made a <em>tiny</em> bit of sense after a couple of weeks of frustration.</p>
+<p>This article is my attempt to explain the underlying mechanics of the State Monad to try and relief the frustration of whomever who was in my position.</p>
+<p>This is also my <em>first</em> post on functional concepts, any feedback would be greatly appreciated.</p>
+<p>You can grab the complete code below:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Data.Maybe</span>
+
+<span class="kw">newtype</span> <span class="dt">State</span> s a <span class="fu">=</span> <span class="dt">State</span> (s <span class="ot">-&gt;</span> (a, s))
+
+<span class="ot">get ::</span> <span class="dt">State</span> s s
+get <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (s, s))
+
+<span class="ot">put ::</span> s <span class="ot">-&gt;</span> <span class="dt">State</span> s ()
+put s <span class="fu">=</span> <span class="dt">State</span> (const ((), s))
+
+<span class="ot">runState ::</span> <span class="dt">State</span> s a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (a, s)
+runState (<span class="dt">State</span> f) <span class="fu">=</span> f
+
+<span class="kw">instance</span> <span class="dt">Functor</span> (<span class="dt">State</span> s) <span class="kw">where</span>
+  fmap f (<span class="dt">State</span> g) <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> <span class="kw">let</span> (a, s') <span class="fu">=</span> g s <span class="kw">in</span> (f a, s'))
+
+<span class="kw">instance</span> <span class="dt">Applicative</span> (<span class="dt">State</span> s) <span class="kw">where</span>
+  pure a <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (a, s))
+
+  (<span class="fu">&lt;*&gt;</span>) (<span class="dt">State</span> f) (<span class="dt">State</span> g) <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> <span class="kw">let</span> (f', s') <span class="fu">=</span> f s
+                                               (a, s'') <span class="fu">=</span> g s'
+                                            <span class="kw">in</span> (f' a, s''))
+
+<span class="kw">instance</span> <span class="dt">Monad</span> (<span class="dt">State</span> s) <span class="kw">where</span>
+  return <span class="fu">=</span> pure
+  (<span class="fu">&gt;&gt;=</span>) (<span class="dt">State</span> f) g <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> <span class="kw">let</span> (a, s') <span class="fu">=</span> f s
+                                       s''     <span class="fu">=</span> g a
+                                    <span class="kw">in</span> runState s'' s')
+  (<span class="fu">&gt;&gt;</span>) a b <span class="fu">=</span> a <span class="fu">&gt;&gt;=</span> \_ <span class="ot">-&gt;</span> b
+
+<span class="ot">myStateMonad ::</span> <span class="dt">State</span> <span class="dt">Int</span> (<span class="dt">Maybe</span> <span class="dt">Int</span>)
+myStateMonad <span class="fu">=</span> <span class="kw">do</span>
+  x <span class="ot">&lt;-</span> get
+  <span class="kw">if</span> x <span class="ot">`mod`</span> <span class="dv">2</span> <span class="fu">==</span> <span class="dv">0</span>
+     <span class="kw">then</span> <span class="kw">do</span> put <span class="dv">5</span>
+             return (<span class="dt">Just</span> <span class="dv">2</span>)
+     <span class="kw">else</span> return <span class="dt">Nothing</span></code></pre></div>
+<h1 id="introduction-motivation">Introduction &amp; Motivation</h1>
+<p>State monads were created to represent <em>stateful computations</em> in pure languages like Haskell. Stateful computations are computations which mutates the state of a non-local variable upon certain conditions.</p>
+<center>
+<img src="https://i.imgur.com/HMFQsOL.png" />
+<h5>
+Pure vs stateful functions
+</h5>
+</center>
+<p>In functional programming, we like having our cake and eating it too - we want a pure function that is capable of embedding arbitrary state. When I first started functional programming I often got around this by adding an additional parameter to represent the current ‘state’ the function was in. E.g.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Keep track of odd numbers in string format from a list of integers</span>
+<span class="ot">stringOdd ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> [<span class="dt">Integral</span>] <span class="ot">-&gt;</span> <span class="dt">String</span>
+stringOdd s []       <span class="fu">=</span> s
+stringOdd s (x <span class="fu">:</span> xs) <span class="fu">=</span> stringOdd (s <span class="fu">++</span> <span class="fu">$</span> <span class="kw">if</span> odd x <span class="kw">then</span> (show x) <span class="kw">else</span> <span class="st">&quot;&quot;</span>) xs</code></pre></div>
+<p>But this creates a lot of redundency and we can abstract this messy structure using State Monads. The definition of a State Monad is like so:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">newtype</span> <span class="dt">State</span> s a <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (a, s))</code></pre></div>
+<p>Which is just a more general form for <code>stringOdd</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">stringOdd ::</span> <span class="dt">String</span>   <span class="ot">-&gt;</span> [<span class="dt">Integral</span>] <span class="ot">-&gt;</span> <span class="dt">String</span>
+<span class="co">-- replacement</span>
+<span class="ot">stringOdd ::</span> b        <span class="ot">-&gt;</span>  a         <span class="ot">-&gt;</span> b
+<span class="co">-- uncurry</span>
+<span class="ot">stringOdd ::</span> b        <span class="ot">-&gt;</span> (a,           b)
+<span class="co">-- generalized</span>
+<span class="dt">State</span>      (\s        <span class="ot">-&gt;</span> (a,           s))</code></pre></div>
+<h1 id="peeking-into-state-monads">Peeking Into State Monads</h1>
+<h2 id="runstate">runState</h2>
+<p>The definition of the State Monad: <code>State (\s -&gt; (a, s))</code> implies that the constructor <code>State</code> accepts a function which accepts something of type <code>s</code> and returns a tuple containing type <code>a</code> and <code>s</code>. As <code>State</code> accepts a function, we can’t just run it on its own as it is lacking its initial state of type <code>s</code> (which will be supplied by us). This is done using <code>runState</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">runState ::</span> <span class="dt">State</span> s a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (a, s)
+runState (<span class="dt">State</span> f) s <span class="fu">=</span> f s
+
+<span class="co">-- definitions</span>
+<span class="co">-- f   :: (\s -&gt; (a, s))</span>
+<span class="co">-- s   :: s</span>
+<span class="co">-- f s :: (a, s)</span>
+
+<span class="co">-- &gt; runState (State (\s -&gt; (42, s))) 10</span>
+<span class="co">-- &gt; (42, 10)</span></code></pre></div>
+<p>Constrasted with the less general format:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">runStringOddUncurried ::</span> (<span class="dt">String</span> <span class="ot">-&gt;</span> ([<span class="dt">Integral</span>], <span class="dt">String</span>)) <span class="ot">-&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> ([<span class="dt">Integral</span>], <span class="dt">String</span>)
+runStringOddUncurried f s <span class="fu">=</span> f s</code></pre></div>
+<p>The only difference between the two is that <code>runState</code> unpacks the function <code>f</code> from the data constructor <code>State</code> before applying it to the variable of type <code>s</code>.</p>
+<h2 id="functor-applicative-monad-instance">Functor, Applicative, Monad Instance</h2>
+<p>We know that Monads are a subset of Functors (specifically Applicative Functors), and as such we need to define State monad’s instance for Functor, Applicative, and Monad and the definitions of which can be seen below:</p>
+<p>*<em>Should you get stuck, try imagining it as a high school algebra test where you have to rearrange an equation (e.g. <code>x = 10y + 5</code> -&gt; <code>y = (x - 5)/10</code>) to solve for x/y. Match up all the types!</em></p>
+<h3 id="functor-instance">Functor Instance</h3>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">Functor</span> (<span class="dt">State</span> s) <span class="kw">where</span>
+
+  <span class="co">-- fmap :: (a -&gt; b) -&gt; State s a -&gt; State s b</span>
+
+  <span class="co">-- State s a :: State (\s -&gt; (a,      s))</span>
+  <span class="co">-- g         ::              (a -&gt; b)</span>
+  <span class="co">-- f         ::       (\s -&gt; (a,      s))</span>
+  <span class="co">-- WANT      :: State (\s -&gt; (b,      s))</span>
+
+  fmap g (<span class="dt">State</span> f) <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> <span class="kw">let</span> (a, s') <span class="fu">=</span> f s
+                                       b      <span class="fu">=</span> g a
+                                    <span class="kw">in</span> (b, s'))
+
+  <span class="co">-- Type Breakdown --</span>
+  <span class="co">-- a  :: a</span>
+  <span class="co">-- s' :: s</span>
+  <span class="co">-- b  :: b</span></code></pre></div>
+<p>Being a functor instance, we can now compose our function in construct <code>State</code> with any arbitrary function that takes an <code>a</code> and spits out a <code>b</code>. E.g:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- &gt; runState (State (\s -&gt; (42, s))) 5</span>
+<span class="co">-- &gt; (42, 5)</span>
+
+<span class="co">-- &gt; runState (fmap (+1) (State (\s -&gt; (42, s)))) 5</span>
+<span class="co">-- &gt; (43, 5)</span></code></pre></div>
+<h3 id="applicative-instance">Applicative Instance</h3>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">Applicative</span> (<span class="dt">State</span> s) <span class="kw">where</span>
+  <span class="co">-- pure  :: a -&gt; State s a</span>
+  
+  <span class="co">-- a         :: a</span>
+  <span class="co">-- WANT      :: State (\s -&gt; (a, s))</span>
+  pure a <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (a, s))
+
+  <span class="co">-- (&lt;*&gt;) :: (State s (a -&gt; b)) -&gt; State s a -&gt; State s b</span>
+
+  <span class="co">-- State s a :: State (\s -&gt; (a,      s))</span>
+  <span class="co">-- f         ::       (\s -&gt; (a -&gt; b, s))</span>
+  <span class="co">-- g         ::       (\s -&gt; (a,      s))</span>
+  <span class="co">-- WANT      :: State (\s -&gt; (b,      s))</span>
+
+  (<span class="fu">&lt;*&gt;</span>) (<span class="dt">State</span> f) (<span class="dt">State</span> g) <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> <span class="kw">let</span> (f', s') <span class="fu">=</span> f s
+                                               (a, s'') <span class="fu">=</span> g s'
+                                               b        <span class="fu">=</span> f' a
+                                            <span class="kw">in</span> (b, s''))
+
+  <span class="co">-- Type Breakdown --</span>
+  <span class="co">-- f'  :: a -&gt; b</span>
+  <span class="co">-- s'  :: s</span>
+  <span class="co">-- a   :: a</span>
+  <span class="co">-- s'' :: s</span>
+  <span class="co">-- b   :: b</span></code></pre></div>
+<p>Being a Applicative instance, we now have a more powerful tool for function composition. We can now compose the State Monad that returns a partial functions with a regular State Monad. This way, we are able to compose both the state (type <code>s</code>), and the output (type <code>a</code>)</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- &gt; runState (State (\s -&gt; (42, s))) 10</span>
+<span class="co">-- &gt; (42, 10)</span>
+
+<span class="co">-- &gt; runState ((&lt;*&gt;) (State (\s -&gt; ((+5), s+1))) (State (\s -&gt; (42, s)))) 10</span>
+<span class="co">-- &gt; (47, 11)</span></code></pre></div>
+<h3 id="monad-instance">Monad Instance</h3>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">Monad</span> (<span class="dt">State</span> s) <span class="kw">where</span>
+  <span class="co">-- return  :: a -&gt; State s a</span>
+  
+  <span class="co">-- a         :: a</span>
+  <span class="co">-- WANT      :: State (\s -&gt; (a, s))</span>
+  return <span class="fu">=</span> pure
+
+  <span class="co">-- (&gt;&gt;=) :: State s a -&gt; (a -&gt; State s b) -&gt; State s b</span>
+
+  <span class="co">-- State s a ::      State (\s -&gt; (a, s))</span>
+  <span class="co">-- g         :: a -&gt; State (\s -&gt; (b, s))</span>
+  <span class="co">-- f         ::            (\s -&gt; (a, s))</span>
+  <span class="co">-- WANT      ::      State (\s -&gt; (b, s))</span>
+
+  (<span class="fu">&gt;&gt;=</span>) (<span class="dt">State</span> f) g <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> <span class="kw">let</span> (a, s')         <span class="fu">=</span> f s
+                                       (<span class="dt">State</span> stateS2) <span class="fu">=</span> g a
+                                       (b, s'')        <span class="fu">=</span> stateS2 s'
+                                    <span class="kw">in</span> (b, s''))
+
+  <span class="co">-- Type Breakdown --</span>
+  <span class="co">-- a       :: a</span>
+  <span class="co">-- s'      :: s</span>
+  <span class="co">-- stateS2 :: (\s -&gt; (b, s))</span>
+  <span class="co">-- b       :: b</span>
+  <span class="co">-- s''     :: s</span>
+
+  <span class="co">-- (&gt;&gt;) :: State s a -&gt; State s b -&gt; State s b</span>
+  (<span class="fu">&gt;&gt;</span>) a b <span class="fu">=</span> a <span class="fu">&gt;&gt;=</span> (\_ <span class="ot">-&gt;</span> b)</code></pre></div>
+<p>I’m not going to explain Monads, primarily because I <em>don’t think</em> I understand it enough to explain in a way that doesn’t fall into the <a href="https://byorgey.wordpress.com/2009/01/12/abstraction-intuition-and-the-monad-tutorial-fallacy/">“Monad Tutorial Fallacy”</a> zone. So other than giving you an analogue of how Monads are like containers or a burrito, I’m simply going to tell you that we are defining the Monad instance in order to ultilize the <a href="https://en.wikibooks.org/wiki/Haskell/do_notation">do notation</a> to have a higher level understanding of how to use the State Monad and why does it even work.</p>
+<h2 id="put-get">Put &amp; Get</h2>
+<p>Before we proceed any further, we will define two helper functions - <code>get</code> and <code>put</code>.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">get ::</span> <span class="dt">State</span> s s
+get <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (s, s))
+
+<span class="ot">put ::</span> a <span class="ot">-&gt;</span> <span class="dt">State</span> () a
+put a <span class="fu">=</span> <span class="dt">State</span> (\_ <span class="ot">-&gt;</span> ((), a))</code></pre></div>
+<p>It might not make sense now, but <code>get</code> allows us to extract the current state from the State Monad, whereas <code>put</code> allows us to ‘update’ the value of <code>s</code> in the State Monad (<code>State s a</code>).</p>
+<p>Just keep that concept in the back of your head while we move onto the next section.</p>
+<h1 id="usage">Usage</h1>
+<p>So, now that we have defined the foundation of our State Monad, we are ready to use it!</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">myStateMonad ::</span> <span class="dt">State</span> <span class="dt">Int</span> (<span class="dt">Maybe</span> <span class="dt">Int</span>)
+myStateMonad <span class="fu">=</span> <span class="kw">do</span>
+  x <span class="ot">&lt;-</span> get
+  <span class="kw">if</span> x <span class="ot">`mod`</span> <span class="dv">2</span> <span class="fu">==</span> <span class="dv">0</span>
+     <span class="kw">then</span> <span class="kw">do</span> put <span class="dv">5</span>
+             return (<span class="dt">Just</span> <span class="dv">2</span>)
+     <span class="kw">else</span> return <span class="dt">Nothing</span>
+
+<span class="co">-- &gt; runState myStateMonad 2</span>
+<span class="co">-- &gt; (Just 2, 5)</span>
+
+<span class="co">-- &gt; runState myStateMonad 1</span>
+<span class="co">-- &gt; (Nothing, 1)</span></code></pre></div>
+<p>Wait, what? How does it do that? How does <code>get</code> extract the value from the State Monad and assign it to <code>x</code>? How does <code>put</code> update the state value?</p>
+<h1 id="explanation">Explanation</h1>
+<p>Lets start off by de-sugarizing the syntax.</p>
+<h3 id="example-1">Example 1</h3>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">f <span class="fu">=</span> <span class="kw">do</span>
+  x <span class="ot">&lt;-</span> get
+  return (x <span class="fu">+</span> <span class="dv">1</span>)
+
+<span class="co">-- is equivalent to</span>
+
+f <span class="fu">=</span> get <span class="fu">&gt;&gt;=</span> (\x <span class="ot">-&gt;</span> return (x <span class="fu">+</span> <span class="dv">1</span>))</code></pre></div>
+<p>To understand what is going on behind the scenes in <code>get</code>, we need to take off our imperative programming hat and start thinking in terms of function composition. If we look back to the definition of <code>(&gt;&gt;=)</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">(<span class="fu">&gt;&gt;=</span>) (<span class="dt">State</span> f) g <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> <span class="kw">let</span> (a, s')         <span class="fu">=</span> f s
+                                     (<span class="dt">State</span> stateS2) <span class="fu">=</span> g a
+                                     (b, s'')        <span class="fu">=</span> stateS2 s'
+                                  <span class="kw">in</span> (b, s''))</code></pre></div>
+<p>Replacing</p>
+<ul>
+<li><code>f</code> with <code>(\s -&gt; (s, s))</code></li>
+<li><code>g</code> with <code>\x -&gt; State (\s -&gt; (x + 1, s))</code></li>
+</ul>
+<p>from example 1 yields:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">(<span class="fu">&gt;&gt;=</span>) (<span class="dt">State</span> f) g <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> <span class="kw">let</span> (a, s')         <span class="fu">=</span> (\s <span class="ot">-&gt;</span> (s, s)) s
+                                     (<span class="dt">State</span> stateS2) <span class="fu">=</span> (\x <span class="ot">-&gt;</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (x <span class="fu">+</span> <span class="dv">1</span>, s))) a
+                                     (b, s'')        <span class="fu">=</span> (\s <span class="ot">-&gt;</span> (x <span class="fu">+</span> <span class="dv">1</span>, s)) s'  <span class="co">-- x is computed on run time from the previous line</span>
+                                  <span class="kw">in</span> (b, s''))</code></pre></div>
+<p>Now, if we apply it to <code>runState</code> and supply it with an initial value of <code>10</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- runState :: State s a -&gt; s -&gt; (a, s)</span>
+<span class="co">-- runState (State f) = f s</span>
+
+
+<span class="fu">&gt;</span> runState (<span class="dt">State</span> (\s <span class="ot">-&gt;</span> <span class="kw">let</span> (a, s')         <span class="fu">=</span> (\s <span class="ot">-&gt;</span> (s, s)) s
+<span class="fu">&gt;</span>                            (<span class="dt">State</span> stateS2) <span class="fu">=</span> (\x <span class="ot">-&gt;</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (x <span class="fu">+</span> <span class="dv">1</span>, s))) a
+<span class="fu">&gt;</span>                            (b, s'')        <span class="fu">=</span> (\s <span class="ot">-&gt;</span> (x <span class="fu">+</span> <span class="dv">1</span>, s)) s'
+<span class="fu">&gt;</span>                         <span class="kw">in</span> (b, s''))) <span class="dv">10</span>
+
+
+<span class="fu">&gt;</span> (\s <span class="ot">-&gt;</span> <span class="kw">let</span> (a, s') <span class="fu">=</span> (\s <span class="ot">-&gt;</span> (s, s)) s
+<span class="fu">&gt;</span>            (<span class="dt">State</span> stateS2) <span class="fu">=</span> (\x <span class="ot">-&gt;</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (x <span class="fu">+</span> <span class="dv">1</span>, s))) a
+<span class="fu">&gt;</span>            (b, s'')        <span class="fu">=</span> (\s <span class="ot">-&gt;</span> (<span class="ot">`x + 1`</span>, s)) s'  <span class="co">-- (x + 1) is done on runtime</span>
+<span class="fu">&gt;</span>         <span class="kw">in</span> (b, s'')) <span class="dv">10</span>
+
+<span class="fu">&gt;</span> (<span class="kw">let</span> (a, s') <span class="fu">=</span> (\s <span class="ot">-&gt;</span> (s, s)) <span class="dv">10</span>) <span class="fu">...</span>
+<span class="co">-- (a, s') = (10, 10)</span>
+
+<span class="fu">&gt;</span> (<span class="dt">State</span> stateS2) <span class="fu">=</span> (\x <span class="ot">-&gt;</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (x <span class="fu">+</span> <span class="dv">1</span>, s))) a
+<span class="fu">&gt;</span> (<span class="dt">State</span> stateS2) <span class="fu">=</span> (\x <span class="ot">-&gt;</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (x <span class="fu">+</span> <span class="dv">1</span>, s))) <span class="dv">10</span>
+<span class="co">-- (State stateS2) = State (\s -&gt; (10 + 1, s))</span>
+
+<span class="fu">&gt;</span> (b, s'') <span class="fu">=</span> stateS2 s'
+<span class="fu">&gt;</span> (b, s'') <span class="fu">=</span> (\s <span class="ot">-&gt;</span> (<span class="dv">10</span> <span class="fu">+</span> <span class="dv">1</span>, s)) <span class="dv">10</span>
+<span class="co">-- (b, s'') = (11, 10)</span></code></pre></div>
+<p>Therefore,</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- &gt; runState (get &gt;&gt;= (\x -&gt; return (x + 1))) 10</span>
+<span class="co">-- &gt; (11, 10)</span></code></pre></div>
+<h3 id="example-2">Example 2</h3>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">f <span class="fu">=</span> <span class="kw">do</span>
+  put <span class="dv">5</span>  
+  return <span class="dv">10</span>
+
+<span class="co">-- is equilavent to</span>
+
+f <span class="fu">=</span> put <span class="dv">5</span> <span class="fu">&gt;&gt;</span> return <span class="dv">10</span></code></pre></div>
+<p>To get a grasp of how <code>put :: a -&gt; (State (\_ -&gt; ((), a)))</code> works, we apply same technique from the previous example to obtain a better sense of what’s going on behind the hood. Recall that <code>(&gt;&gt;) a b = a &gt;&gt;= \_ -&gt; b</code>. The function <code>\_ -&gt; b</code> just means that our function ignores the input and just returns us <code>b</code>.</p>
+<p>We can now replace</p>
+<ul>
+<li><code>f</code> with <code>put 5 :: State (\_ -&gt; ((), 5))</code></li>
+<li><code>g</code> with <code>\_ -&gt; return 10 :: \_ -&gt; State (\s -&gt; (10, s))</code></li>
+</ul>
+<p>this yields us:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- f &gt;&gt;= \_ -&gt; g</span>
+
+(<span class="fu">&gt;&gt;=</span>) (<span class="dt">State</span> f) g <span class="fu">=</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> <span class="kw">let</span> (a, s')         <span class="fu">=</span> (\_ <span class="ot">-&gt;</span> ((), <span class="dv">5</span>)) s                <span class="co">-- a :: ()</span>
+                                     (<span class="dt">State</span> stateS2) <span class="fu">=</span> (\_ <span class="ot">-&gt;</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (<span class="dv">10</span>, s))) a  <span class="co">-- Ignores input and returns a State data type</span>
+                                     (b, s'')        <span class="fu">=</span> stateS2 s'
+                                  <span class="kw">in</span> (b, s''))</code></pre></div>
+<p>Now if we apply <code>runState</code> and supplying it with an initial value of <code>20</code>, we’ll get:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="fu">&gt;</span> runState <span class="dt">State</span> (\s <span class="ot">-&gt;</span> <span class="kw">let</span> (a, s')         <span class="fu">=</span> (\_ <span class="ot">-&gt;</span> ((), <span class="dv">5</span>)) s                <span class="co">-- a :: ()</span>
+<span class="fu">&gt;</span>                           (<span class="dt">State</span> stateS2) <span class="fu">=</span> (\_ <span class="ot">-&gt;</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (<span class="dv">10</span>, s))) a  <span class="co">-- Ignores input and returns a State data type</span>
+<span class="fu">&gt;</span>                           (b, s'')        <span class="fu">=</span> stateS2 s'
+<span class="fu">&gt;</span>                       <span class="kw">in</span> (b, s'')) <span class="dv">5</span>
+
+<span class="fu">&gt;</span> (\s <span class="ot">-&gt;</span> <span class="kw">let</span> (a, s')         <span class="fu">=</span> (\_ <span class="ot">-&gt;</span> ((), <span class="dv">5</span>)) s                <span class="co">-- a :: ()</span>
+<span class="fu">&gt;</span>            (<span class="dt">State</span> stateS2) <span class="fu">=</span> (\_ <span class="ot">-&gt;</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (<span class="dv">10</span>, s))) a  <span class="co">-- Ignores input and returns a State data type</span>
+<span class="fu">&gt;</span>            (b, s'')        <span class="fu">=</span> stateS2 s'
+<span class="fu">&gt;</span>        <span class="kw">in</span> (b, s'')) <span class="dv">20</span>
+
+<span class="fu">&gt;</span> (a, s') <span class="fu">=</span> (\_ <span class="ot">-&gt;</span> ((), <span class="dv">5</span>)) s
+<span class="fu">&gt;</span> (a, s') <span class="fu">=</span> (\_ <span class="ot">-&gt;</span> ((), <span class="dv">5</span>)) <span class="dv">20</span>
+<span class="co">-- (a, s') = ((), 5)</span>
+
+<span class="fu">&gt;</span> (<span class="dt">State</span> stateS2) <span class="fu">=</span> (\_ <span class="ot">-&gt;</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (<span class="dv">10</span>, s))) a
+<span class="fu">&gt;</span> (<span class="dt">State</span> stateS2) <span class="fu">=</span> (\_ <span class="ot">-&gt;</span> <span class="dt">State</span> (\s <span class="ot">-&gt;</span> (<span class="dv">10</span>, s))) ()
+<span class="co">-- stateS2 = State (\s -&gt; (10, s))</span>
+
+<span class="fu">&gt;</span> (b, s'') <span class="fu">=</span> stateS2 <span class="dv">5</span>
+<span class="fu">&gt;</span> (b, s'') <span class="fu">=</span> (\s <span class="ot">-&gt;</span> (<span class="dv">10</span>, s)) <span class="dv">5</span>
+<span class="co">-- (b, s'') = (10, 5)</span></code></pre></div>
+<p>Therefore,</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- &gt; runState (put 5 &gt;&gt; (return 10)) 20</span>
+<span class="co">-- &gt; (10, 5)</span></code></pre></div>
+<p>And that is why <code>get &gt;&gt;= (\x -&gt; ..)</code> will bind the current value (<code>a</code> from <code>(a, s)</code> to <code>x</code>), and <code>put x</code> will update the <code>s</code> in <code>(a, s)</code> to be the value <code>x</code>.</p>
+<h1 id="conclusion-summary">Conclusion &amp; Summary</h1>
+<p>All in all, the State Monad is <em>just an abstraction</em> to impose State into pure functions (as the name suggests), and there exists a set of rules (e.g. Functor, Applicative, Monad) that states how these components compose together.</p>
+<p>Should you get confused on why/how a certain component works, I suggest writing it down on paper and try figuring it out from there. If you are still stumped, there’s lots of helpful people on the #haskell IRC channel!</p>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>

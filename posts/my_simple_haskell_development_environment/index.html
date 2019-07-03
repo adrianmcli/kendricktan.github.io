@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>My Simple Haskell Development Environment | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>My Simple Haskell Development Environment</h1>
+             <div class="info">
+    Posted on 2018-12-16    
+    
+        by Kendrick Tan
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<h1 id="background">Background</h1>
+<p>When I started developing in Haskell, there were many opinions on what build-tools, what IDE/text-editor you should use. Each coming with their own pros and cons.</p>
+<p>After playing around with the number of options, I eventually found a setup which <em>just works</em>, and would like to share that tool stack with anyone / newcomers who are still undecided on what toolchain they should use.</p>
+<h1 id="project-building-and-management">Project Building and Management</h1>
+<p>For the project building and management side of things, <code>Nix</code> and <code>Cabal</code> is my main go-to solution.</p>
+<h2 id="nix-and-cabal">Nix and Cabal</h2>
+<p>Nix is a package manager for Linux and Unix systems. (Think <code>virtualenv</code> but on steroids).</p>
+<p>Cabal is a package manager for Haskell, combine that with <code>Nix</code> and you’ll have next level sandboxing and environment reproducability.</p>
+<h1 id="editors">Editors</h1>
+<p>I tried many different editors/ide-combos but eventually settled on <code>NeoVim</code> with <code>ghci</code>, due to it’s sheer simplicity.</p>
+<h2 id="neovim">NeoVim</h2>
+<center>
+<img src="https://i.imgur.com/R5i7BPJ.png" />
+</center>
+<p>NeoVim is great. It’s lightweight, its simple, and it boots up almost instantly. It also does the one thing you want a text editor to do really well - editing text.</p>
+<p><a href="https://gist.githubusercontent.com/kendricktan/e3936d0b93b677d6f4ca843fe74c77d0/raw/b032153693f9b77935a30f946c5d2414cd504300/init.vim">You can grab the neovim config file here</a></p>
+<h2 id="ghci">GHCI</h2>
+<p><strong>G</strong>lasgow’s <strong>H</strong>askell <strong>C</strong>ompiler <strong>I</strong>nteractive is a REPL for Haskell. Just because it’s simple doesn’t mean its not powerful though.</p>
+<p>With the use of <code>typeholes</code> (<code>_</code>), <code>ghci</code> will able infer the types and assist you in solving the problem.</p>
+<center>
+<img src="https://i.imgur.com/HiGV517.png">
+</center>
+<h1 id="conclusion">Conclusion</h1>
+<p>Developing on Haskell can be as complicated, or as simple as you choose it to be.</p>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>

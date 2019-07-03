@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>RSA Explained (With Examples) | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } },
+        tex2jax: {
+          inlineMath: [ ['\\(','\\)'] ],
+          processEscapes: true,
+        },
+        "HTML-CSS": {                  
+          linebreaks: {                  
+            automatic: true                   
+          }                  
+        }
+      });
+    </script>    
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full">
+    </script>
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>RSA Explained (With Examples)</h1>
+             <div class="info">
+    Posted on 2019-01-11    
+    
+        by Kendrick Tan
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<h1 id="motivation">Motivation</h1>
+<blockquote>
+<p>RSA (Rivest-Shamir-Adleman) is one of the first public-key cryptosystems and is widely used for secure data transmission. In such a cryptosystem, the encryption key is public and is different from the decryption key which is kept secret.</p>
+</blockquote>
+<p>If I wanted to comprehend <a href="https://ethresear.ch/t/zero-knowledge-proofs-starter-pack/4519">zero</a> <a href="https://zkp.science/">knowledge</a> <a href="https://www.zeroknowledge.fm/">proofs</a>, then understanding the grand-daddy of public-key cryptosystems is a must.</p>
+<h1 id="background-maths">Background Maths</h1>
+<h2 id="exponential-rules-1">Exponential Rules <sub>[1]</sub></h2>
+<p><br /><span class="math display">$$
+\begin{align} \label{eq:exponent_rule}
+g^{a-b} &amp;= \dfrac{g^a}{g^b} \newline
+g^{a+b} &amp;= g^a g^b \newline
+{(g^a)}^b &amp;= g^{ab} \newline
+(g^a\ mod\ p)^{b}\ mod\ p &amp;= g^{ab}\ mod\ p
+\end{align}
+$$</span><br /></p>
+<h2 id="division-theorem-2">Division Theorem <sub>[2]</sub></h2>
+<p>The division theorem gives us a formal way to proof the equivalence relationship between the <strong>divident, divisor, quotient,</strong> and the <strong>remainder</strong>. i.e.</p>
+<p><br /><span class="math display">$$
+\begin{align}
+divident &amp;\equiv quotient \cdot divisor + remainder \newline
+n &amp;\equiv k \cdot q + r
+\end{align}
+$$</span><br /></p>
+<div class="center">
+<p><img src="https://i.imgur.com/1naLv53.png" /></p>
+</div>
+<p><strong>Example</strong>: \( 9/2 = 4 \ remainder \ 1 \)</p>
+<p>We can write the equation as \(9 = 2⋅4 + 1\).</p>
+<h2 id="modulo-arithmetic">Modulo Arithmetic</h2>
+<blockquote>
+<p>\(a = b \ mod \ n\) states that \(a\) and \(b\) both have the same remainder after division with \(n\).</p>
+</blockquote>
+<p>Modular arithemtic and the divisor theorem are closely related – say we have \(k = 2, q = 7, r = 3\), plugging those values into \(n = kq + r\) gives us \(n = 17\).</p>
+<p>We can write that as \(17 = 3 \ mod \ 7 \), or \( 17 / 7 = 2 \ remainder \ 3 \).</p>
+<p>We can also go backwards:</p>
+<div class="center">
+<p>\(17 = 3 \ mod \ 7\) <br /> \(17 = k⋅7 + 3\)</p>
+</div>
+<p>More generally:</p>
+<p><br /><span class="math display">$$
+\begin{align}
+n &amp;= r \space mod \space q \newline \label{eq:modulo_division_format}
+n &amp;= k ⋅ q + r
+\end{align}
+$$</span><br /></p>
+<h2 id="greatest-common-divisor-gcd">Greatest Common Divisor (gcd)</h2>
+<blockquote>
+<p>The greatest common divisor between two numbers is the largest integer that will divide both numbers.</p>
+</blockquote>
+<p><strong>Example:</strong> gcd(3, 9) = 3.</p>
+<p>If one of the numbers in the gcd is a prime number, then the gcd will <em>always</em> be 1.</p>
+<h2 id="multiplicative-inverse">Multiplicative Inverse</h2>
+<blockquote>
+<p>A multiplicative inverse for a number \( x \), denoted by \( x^{-1} \), is a number when multiplied by \(x\) yields the multiplicative identity \(1\).</p>
+</blockquote>
+<div class="center">
+<p>\(x⋅x^{-1} = 1\)</p>
+</div>
+<p>In modulo arithmetic, only numbers whose \(gcd(x, n) = 1\) has a multiplicative inverse, i.e there exists</p>
+<p><br /><span class="math display">$$
+\begin{align}
+x \cdot x^{-1} = 1\ mod\ n,\ \forall gcd(x, n) = 1 \label{eq:multiplicative_inverse_modulus}
+\end{align}
+$$</span><br /></p>
+<h2 id="eulers-totient-function">Euler’s Totient Function</h2>
+<blockquote>
+<p>In number theory, Euler’s totient function counts the positive integers up to a given integer n that are relatively prime to n.</p>
+</blockquote>
+<p>In other words, the totient function (often represented as <span class="math inline"><em>ϕ</em></span>) for number \(n\) calculates the number of integers between \(2\) and \(n\) whose gcd is equal to \(1\).</p>
+<p>More concretely in code:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> totient(n):
+    total <span class="op">=</span> <span class="dv">0</span>
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>, n):
+        <span class="cf">if</span> gcd(i, n) <span class="op">==</span> <span class="dv">1</span>:
+            total <span class="op">=</span> total <span class="op">+</span> <span class="dv">1</span>
+    <span class="cf">return</span> total</code></pre></div>
+<p>If \(n\) is a prime number, then \(ϕ(n) = n - 1\).</p>
+<p>One important thing to note is that multiplication in the totient function is associative:</p>
+<p><br /><span class="math display">$$
+\begin{align}
+\phi(a \cdot b) &amp;= \phi(a) \cdot \phi(b) \label{eq:totient_multiplication_associative}
+\end{align}
+$$</span><br /></p>
+<p>This will come into use when we calculate \(ϕ(n)\) where \(n = pq\).</p>
+<h2 id="eulers-theorem-3">Euler’s Theorem <sub>[3]</sub></h2>
+<p><br /><span class="math display">$$
+\begin{align}
+a^{ϕ(n)} ≡ 1 \space mod \space n \label{eq:eulers_theorem}
+\end{align}
+$$</span><br /></p>
+<p>The following formula above holds true if the gcd between \(n\) and \(a\) is \(1\) (a.k.a coprime).</p>
+<h1 id="rsa">RSA</h1>
+<h2 id="introduction">Introduction</h2>
+<p>Say we have message <span class="math inline"><em>M</em></span>, with public key <span class="math inline"><em>P</em><em>k</em></span>, and secret key <span class="math inline"><em>S</em><em>k</em></span>, we can encrypt <span class="math inline"><em>M</em></span> with <span class="math inline"><em>P</em><em>k</em></span> as cipher <span class="math inline"><em>C</em></span> and decrypt <span class="math inline"><em>C</em></span> with <span class="math inline"><em>S</em><em>k</em></span>.</p>
+<div class="center">
+<p><img src="//i.imgur.com/Sf1DfVo.png"></p>
+</div>
+<h2 id="algorithm">Algorithm</h2>
+<ol style="list-style-type: decimal">
+<li>Generate two randomly large <strong>prime</strong> numbers \(p\), and \(q\).</li>
+<li>Calculate \(n = pq\).</li>
+<li>Calculate totient of n \(ϕ(n) = (p - 1)⋅(q - 1)\).</li>
+<li>Generate <em>public key</em> \(e\) that satifies the two constraints:
+<ul>
+<li>\(3 &lt; e &lt; ϕ(n)\)</li>
+<li>\(gcd(e, ϕ(n)) = 1\)</li>
+</ul></li>
+<li>Calculate the multiplicative inverse of \(e, d\) (this will be the private key) such that \(ed = 1 \ mod \ ϕ(n)\)</li>
+<li>The generated public key is \( (e, n) \), and the generated private key is \( (d, n) \).</li>
+<li>Given message \(m\), \( m^{e} \ mod \ n \) yields the encrypted message, and \( m^{ed} \ mod \ n \) yields the decrypted message.
+<ul>
+<li>This is because \(ed = 1 \ mod \ n \)</li>
+<li>Therefore, \(m^{ed} \ mod \ n = m^1 \ mod \ n \), giving us our original message</li>
+</ul></li>
+</ol>
+<h2 id="why-rsa-works">Why RSA Works</h2>
+<h3 id="calculating-modulus-n">Calculating Modulus   \( n \)</h3>
+<p>Our modulus, \( n \) is calculated by multiplying the two prime numbers \( p \) and \( q \). This step sort of acts like a one way function, easy to calculate \( n \) given \( p \) and \( q \), but hard to compute \( p \) and \( q \) given \( n \).</p>
+<p>Whats scary to me is that computing the prime factors \( p \) and \( q \) is only considered a <strong>hard enough</strong> problem, meaning that if someone found out how to calculate \( p \) and \( q \) given \( n \) with polynomial complexity, all encryption as we know it (e.g. SSL) will break.</p>
+<p><strong>This is essential to RSA’s security as given a composite number (\( n \)), it is considered a hard problem to determine the prime factors (\( p \), \( q \)).</strong></p>
+<h3 id="totient-function-ϕn">Totient Function   \(ϕ(n)\)</h3>
+<p>\( ϕ(n) = (p - 1)(q - 1) \ when \ p,q \ is \ prime \). This is because the totient of a prime number \(p\) is simply \( p - 1 \), and that multiplication is associative in the totient function (\ref{eq:totient_multiplication_associative}).</p>
+<h3 id="public-key-e">Public Key   \(e\)</h3>
+<p>Public Key \(e\) is a number that is randomly chosen between \( 3 &lt; e &lt; ϕ(n) \), and has to satisfy \( gcd(e, ϕ(n)) = 1 \). We need \( gcd(e, ϕ(n)) = 1 \) in order for a multiplicative inverse (our secret key) to exist (\ref{eq:multiplicative_inverse_modulus}).</p>
+<h3 id="secret-key-d">Secret Key   \(d\)</h3>
+<p>The secret key \( d \) is calculated using the formula: \( d⋅e = 1 \ mod \ ϕ(n) \). This process can be calculated using the extended euclidean algorithm <sub>[4]</sub> given parameters \( e \ and \ ϕ(n) \)</p>
+<h3 id="why-rsa-satifies-proof-of-correctness-even-though-the-key-generation-is-based-on-mod-ϕn-and-not-mod-n">Why RSA satifies proof of correctness even though the key generation is based on   \(mod \ ϕ(n)\) and not \(mod \ n\)</h3>
+<p>Given message \(m\), public key \(e\), and secret key \(d\).</p>
+<p>The encrypt a message we do: <br /><span class="math display">$$
+\begin{align}
+m^{e} \space mod \space n
+\end{align}
+$$</span><br /> And to decrypt said encrypted message, we do: <br /><span class="math display">$$
+\begin{align}
+m^{ed} \space mod \space n \label{eq:decrypted_message_formula}
+\end{align}
+$$</span><br /> Our key generation uses the following formula: <br /><span class="math display">$$
+\begin{align}
+d \cdot e = 1 \space mod \space \phi(n)
+\end{align}
+$$</span><br /> Which can be rewritten as (re: equation \ref{eq:modulo_division_format}): <br /><span class="math display">$$
+\begin{align}
+d \cdot e = k \cdot \phi(n) + 1 \label{eq:modulus_division_substitute}
+\end{align}
+$$</span><br /> Substituting equation \ref{eq:modulus_division_substitute} into equation \ref{eq:decrypted_message_formula} yields us: <br /><span class="math display">$$
+\begin{align}
+m^{k \cdot \phi(n) + 1} \space &amp; mod \space n
+\end{align}
+$$</span><br /> Which can be rewritten as (re: exponential rules \ref{eq:exponent_rule}): <br /><span class="math display">$$
+\begin{align}
+(m^{\phi(n)})^k \cdot m^k \space &amp; mod \space n
+\end{align}
+$$</span><br /> Rewriting using Euler’s Theorem (\(a^{ϕ(n)} = 1 \ mod \ n\), equation \ref{eq:eulers_theorem}) gives us: <br /><span class="math display">$$
+\begin{align}
+(1 \space mod \space n)^k \cdot m^1 \space &amp; mod \space n \newline
+1^k \cdot m^1 \space &amp; mod \space n \newline
+\end{align}
+$$</span><br /> And so, we have just proved that RSA satisfies the proof of correctness even though the key generation is based on \(mod ϕ(n)\) and not \(n\) <br /><span class="math display">$$
+\begin{align}
+\therefore m^{e \cdot d} \space mod \space n = m^1 \space mod \space n
+\end{align}
+$$</span><br /></p>
+<h1 id="conclusion">Conclusion</h1>
+<p>You don’t need to be a math wizard to understand RSA ;-)</p>
+<h1 id="example">Example</h1>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">&quot;&quot;&quot;</span>
+<span class="co">2019-01-06 Kendrick Tan</span>
+<span class="co">RSA</span>
+
+<span class="co">Rivest–Shamir–Adleman (RSA) is a process that allows</span>
+<span class="co">two parties to exchange secret information within</span>
+<span class="co">each other over an insecure line (e.g. the internet)</span>
+
+<span class="co">Party A sends Party B it's public key.</span>
+<span class="co">Party B uses the public key to encrypt the message they want to send</span>
+<span class="co">Party A receives encrypted message, decrypts it using their private key</span>
+<span class="co">&quot;&quot;&quot;</span>
+
+<span class="kw">def</span> gcd(a, b):
+    <span class="co">&quot;&quot;&quot;</span>
+<span class="co">    Greatest Common Divisor</span>
+<span class="co">    &quot;&quot;&quot;</span>
+    m <span class="op">=</span> <span class="bu">min</span>(a, b)
+
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(m, <span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>):
+        <span class="cf">if</span> a <span class="op">%</span> i <span class="op">==</span> <span class="dv">0</span> <span class="kw">and</span> b <span class="op">%</span> i <span class="op">==</span> <span class="dv">0</span>:
+            <span class="cf">return</span> i
+
+    <span class="cf">return</span> <span class="dv">1</span>
+
+<span class="kw">def</span> xgcd(a, b):
+    <span class="co">&quot;&quot;&quot;</span>
+<span class="co">    Extended Euclidean Distance</span>
+
+<span class="co">    return (g, x, y) such that a*x + b*y = g = gcd(x, y)</span>
+<span class="co">    &quot;&quot;&quot;</span>
+    x0, x1, y0, y1 <span class="op">=</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>
+    <span class="cf">while</span> a <span class="op">!=</span> <span class="dv">0</span>:
+        q, b, a <span class="op">=</span> b <span class="op">//</span> a, a, b <span class="op">%</span> a
+        y0, y1 <span class="op">=</span> y1, y0 <span class="op">-</span> q <span class="op">*</span> y1
+        x0, x1 <span class="op">=</span> x1, x0 <span class="op">-</span> q <span class="op">*</span> x1
+    <span class="cf">return</span> b, x0, y0
+
+<span class="kw">def</span> encrypt(msg, e, n):
+    <span class="cf">return</span> <span class="st">''</span>.join([<span class="bu">chr</span>(<span class="bu">ord</span>(c)<span class="op">**</span>e <span class="op">%</span> n) <span class="cf">for</span> c <span class="kw">in</span> msg])
+
+<span class="kw">def</span> decrypt(msg, d, n):
+    <span class="cf">return</span> <span class="st">''</span>.join([<span class="bu">chr</span>(<span class="bu">ord</span>(c)<span class="op">**</span>d <span class="op">%</span> n) <span class="cf">for</span> c <span class="kw">in</span> msg])
+
+<span class="co"># 1. Choose two distinct prime numbers p and q</span>
+p <span class="op">=</span> <span class="dv">23</span>
+q <span class="op">=</span> <span class="dv">31</span>
+
+<span class="co"># 2. Calculate n = p*q</span>
+n <span class="op">=</span> p<span class="op">*</span>q
+
+<span class="co"># 3. Calculate the totient: phi(n) = (p - 1)*(q - 1)</span>
+phi_n <span class="op">=</span> (p <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> (q <span class="op">-</span> <span class="dv">1</span>)
+
+<span class="co"># 4.1 Choose integer e such that 1 &lt; e &lt; phi_n</span>
+e <span class="op">=</span> <span class="dv">7</span>
+<span class="cf">assert</span> <span class="dv">1</span> <span class="op">&lt;</span> e <span class="op">&lt;</span> phi_n
+
+<span class="co"># 4.2 Assert greatest-common-divisor (gcd) between e and phi_n = 1</span>
+<span class="co"># i.e. e and phi_n share no factors other than 1</span>
+<span class="cf">assert</span> gcd(e, phi_n) <span class="op">==</span> <span class="dv">1</span>
+
+<span class="co"># 5. Compure d to satisgy the congruence relation d * e = 1 mod phi_n</span>
+<span class="co"># i.e. de = 1 + k * phi_n</span>
+
+<span class="co"># goal is to find d such that e*d = 1 mod phi_n</span>
+<span class="co"># EED calculates x and y such that ax + by = gcd(a, b)</span>
+<span class="co"># Let a = e, b = phi_n, therefore:</span>
+<span class="co"># gcd(e, phi_n) = 1 </span>
+<span class="co"># is equal to</span>
+<span class="co"># e*x + phi_n*y = 1</span>
+<span class="co"># take mod phi_n</span>
+<span class="co"># (e*x + phi_ny*y) mod phi_n = 1 mod phi_n</span>
+<span class="co"># = e*x = 1 mod phi_n</span>
+_, d, _ <span class="op">=</span> xgcd(e, phi_n)
+
+<span class="cf">assert</span> (d <span class="op">*</span> e <span class="op">%</span> phi_n) <span class="op">==</span> <span class="dv">1</span>
+
+<span class="co"># 6. Encrypt a message using the public key (e)</span>
+<span class="co"># c = m**e % n</span>
+orig_msg <span class="op">=</span> <span class="st">'hello world'</span>
+enc_msg <span class="op">=</span> encrypt(orig_msg, e, n)
+<span class="cf">assert</span> orig_msg <span class="op">!=</span> enc_msg
+
+<span class="co"># 7. Decrypt number using the private key (d)</span>
+<span class="co"># m = c**e % n</span>
+dec_msg <span class="op">=</span> decrypt(enc_msg, d, n)
+
+<span class="cf">assert</span> orig_msg <span class="op">==</span> dec_msg
+
+<span class="bu">print</span>(<span class="ss">f'original message: </span><span class="sc">{</span>orig_msg<span class="sc">}</span><span class="ss">'</span>)
+<span class="bu">print</span>(<span class="ss">f'encrypted message: </span><span class="sc">{</span>enc_msg<span class="sc">}</span><span class="ss">'</span>)
+<span class="bu">print</span>(<span class="ss">f'decrypted message: </span><span class="sc">{</span>dec_msg<span class="sc">}</span><span class="ss">'</span>)
+
+<span class="co">&quot;&quot;&quot;</span>
+<span class="co">This works because we know that:</span>
+
+<span class="co">d*e = 1 mod phi_n</span>
+<span class="co">d*e = k*phi_n + 1</span>
+
+<span class="co">c = m**e mod n</span>
+<span class="co">m = c**d mod n (sub c)</span>
+<span class="co">  = (m**e mod n)**d mod n</span>
+<span class="co">  = m**(d * e) mod n</span>
+<span class="co">  = m**(k*phi_n + 1) mod n</span>
+<span class="co">  = (m**(phi_n)**k)*m**1 mod n # note: m^(phi_n) = 1 mod n</span>
+<span class="co">  = (1 mod n)**k * m**1 mod n</span>
+<span class="co">  = 1**k * m**1 mod n</span>
+<span class="co">  = m mod n</span>
+
+<span class="co">https://crypto.stackexchange.com/questions/1789/why-is-rsa-encryption-key-based-on-modulo-varphin-rather-than-modulo-n</span>
+<span class="co">&quot;&quot;&quot;</span></code></pre></div>
+<h1 id="references">References</h1>
+<ol style="list-style-type: decimal">
+<li><a href="http://www.math.com/school/subject2/lessons/S2U2L2DP.html">Algebra Basics - Exponents In Depth</a></li>
+<li><a href="https://proofwiki.org/wiki/Division_Theorem">Division Theorem - Proofwiki</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Euler%27s_theorem">Euler’s Theorem</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Extended_euclidean_algorithm">Extended Euclidean Algorithm</a></li>
+</ol>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>

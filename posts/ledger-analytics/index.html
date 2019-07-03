@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>Introducing ledger-analytics - Analytics for ledger-cli | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>Introducing ledger-analytics - Analytics for ledger-cli</h1>
+             <div class="info">
+    Posted on 2018-08-26    
+    
+        by Kendrick Tan
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<h2 id="prelude">Prelude</h2>
+<p>Recently, I’ve been playing around with a really neat accounting tool: <a href="https://www.ledger-cli.org/">ledger-cli</a>.</p>
+<p>I love the simplicity of it, because all it is is a text-file that respects the ledger format. And because it’s just a text-file, it works pretty much <em>everywhere</em>: Linux, Windows, MacOS, you name it. Not only that, I don’t have to download legacy GTK2/GTK3/QT libraries to display the GUI. And, because it’s a text-file, all modern developer tools such as <code>git</code> are applicable to it.</p>
+<p>Sounds great, no?</p>
+<h2 id="personal-gripes-with-ledger-cli">Personal Gripes with ledger-cli</h2>
+<p>ledger-cli is a great tool, but because it’s a CLI tool, generating interactive graphs is out of the question. There’s a couple of tools out there such as <a href="https://github.com/peterkeen/ledger-web">ledger-web</a>, and <a href="http://hledger.org/hledger-web.html">hledger-web</a>. Problem is they either require too much effort to setup (requiring me to install postgres), don’t provide any/enough insight to the data, or both.</p>
+<h2 id="ledger-analytics">ledger-analytics</h2>
+<p><a href="https://github.com/kendricktan/ledger-analytics">ledger-analytics</a> is my attempt at the problem. Currently the core features it provides are:</p>
+<ol style="list-style-type: decimal">
+<li>A general (interactive) overview of your transactions</li>
+<li>Monthly comparison between multiple accounts</li>
+<li>Wealthgrowth</li>
+</ol>
+<p>The usage preview can be seen below:</p>
+<center style="width: 100%, text-align: center">
+<img width="75%" src="https://thumbs.gfycat.com/PaleHeartfeltLice-size_restricted.gif" />
+<h6>
+Account Overview
+</h5>
+</center>
+<br />
+<center style="width: 100%, text-align: center">
+<img width="75%" src="https://thumbs.gfycat.com/InbornRaggedCarpenterant-size_restricted.gif" />
+<h6>
+Account Comparison and Wealthgrowth
+</h5>
+</center>
+<p>The project has just started and is currently in alpha, so if you <a href="https://github.com/kendricktan/ledger-analytics/issues">find any bugs please report them</a>. Again, you can <a href="https://github.com/kendricktan/ledger-analytics">check out the ledger-analytics project here</a>.</p>
+<h2 id="further-reading">Further reading</h2>
+<p>If you’re interesting in plain text accounting, <a href="http://plaintextaccounting.org/">plaintextaccounting</a> has an awesome guide on getting started.</p>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>

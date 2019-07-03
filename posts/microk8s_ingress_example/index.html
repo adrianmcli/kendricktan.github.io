@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>Microk8s With Ingress Example | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>Microk8s With Ingress Example</h1>
+             <div class="info">
+    Posted on 2019-04-02    
+    
+        by Kendrick Tan
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<h1 id="prelude">Prelude</h1>
+<p>This post is merely a reference guide for me to setup Kubernetes with Ingress.</p>
+<h2 id="whats-the-difference-between-ingress-and-a-loadbalancer">What’s The Difference Between Ingress And A Loadbalancer?</h2>
+<p>LoadBalancer lives on L4 on the OSI model, Ingress services lives on L7 of the OSI model.</p>
+<p>Use ingress for a single app with a single domain to be mapped to an IP address, use ingress to map multiple subdomains to multiple apps within your cluster.</p>
+<p>For nicer infographs, refer to <a href="https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-ingress-guide-nginx-example.html">Mathhew Palmer’s blogpost</a>.</p>
+<h1 id="steps">Steps</h1>
+<h2 id="install-microk8s">1. Install MicroK8s</h2>
+<p><a href="https://microk8s.io/#quick-start">Microk8s quickstart link</a></p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">sudo</span> snap install microk8s --classic
+<span class="ex">microk8s.start</span></code></pre></div>
+<h2 id="install-ingress-dependent-resources">2. Install Ingress Dependent Resources</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">microk8s.kubectl</span> apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml</code></pre></div>
+<h2 id="enable-ingress-addon">3. Enable Ingress Addon</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">microk8s.enable</span> ingress</code></pre></div>
+<h2 id="run-a-local-docker-registry">4. Run a local Docker Registry</h2>
+<p>You can skip this step if you wanna host your image on a public/private repository.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">docker</span> run -p 5000:5000 registry</code></pre></div>
+<h2 id="clone-example-repository-and-build-docker-image">5. Clone Example Repository And Build Docker Image</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">git</span> clone https://github.com/kendricktan/microk8s-ingress-example
+<span class="bu">cd</span> microk8s-ingress-example
+
+<span class="ex">docker</span> build . -t my-microk8s-app
+<span class="ex">docker</span> tag my-microk8s-app localhost:5000/my-microk8s-app
+<span class="ex">docker</span> push localhost:5000/my-microk8s-app</code></pre></div>
+<h2 id="run-applications-and-ingress">6. Run Applications And Ingress</h2>
+<pre><code>microk8s.kubectl apply -f bar-deployment.yml
+microk8s.kubectl apply -f foo-deployment.yml
+microk8s.kubectl apply -f ingress.yml</code></pre>
+<h3 id="expose-deployments-to-ingress">7. Expose Deployments to Ingress</h3>
+<p>If you skip this step you’ll get a 503 service unavailable</p>
+<pre><code>microk8s.kubectl expose deployment foo-app --type=LoadBalancer --port=8080
+microk8s.kubectl expose deployment bar-app --type=LoadBalancer --port=8080</code></pre>
+<h3 id="testing-endpoint-out">8. Testing Endpoint Out</h3>
+<pre><code>curl -kL http://127.0.0.1/bar
+curl -kL http://127.0.0.1/foo</code></pre>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>

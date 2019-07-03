@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>Capsule Networks Explained | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>Capsule Networks Explained</h1>
+             <div class="info">
+    Posted on 2017-11-10    
+    
+        by Kendrick Tan
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<hr />
+<p><em>Assumed Knowledge: <a href="https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/">Convolutional Neural Networks</a>, <a href="http://kvfrans.com/variational-autoencoders-explained/">Variational Autoencoders</a></em></p>
+<p><strong>Disclaimer: This article does not cover the mathematics behind Capsule Networks, but rather the intuition and motivation behind them.</strong></p>
+<hr />
+<h2 id="what-are-capsule-networks-and-why-do-they-exist">What are Capsule Networks and why do they exist?</h2>
+<p>The <a href="https://arxiv.org/abs/1710.09829">Capsule Network</a> is a new type of neural network architecture conceptualized by <a href="http://www.cs.toronto.edu/~hinton/">Geoffrey Hinton</a>, the motivation behind Capsule Networks is to address some of the short comings of Convolutional Neural Networks (<strong>ConvNets</strong>), which are listed below:</p>
+<h4 id="problem-1-convnets-are-translation-invariant-1">Problem 1: ConvNets are Translation Invariant <a href="https://aboveintelligent.com/ml-cnn-translation-equivariance-and-invariance-da12e8ab7049"><sub>[1]</sub></a></h4>
+<p>What does that even mean? Imagine that we had a model that predicts cats. You show it an image of a cat, it predicts that it’s a cat. You show it the same image, <em>but shifted to the left</em>, it still thinks that it’s a cat <em>without predicting any additional information</em>.</p>
+<center>
+<img src="https://i.imgur.com/mEIUqT8.png" />
+</center>
+<h5 align="center">
+Figure 1.0: Translation Invariance
+</h5>
+<p>What we want to strive for is <strong>translation equivariance</strong>. That means that when you show it an image of a cat shifted to the right, it predicts that it’s a cat shifted to the right. You show it the same cat but shifted towards the left, it predicts that its a cat shifted towards the left.</p>
+<center>
+<img src="https://i.imgur.com/u4ydpQ6.png" />
+</center>
+<h5 align="center">
+Figure 1.1: Translation Equivariance
+</h5>
+<p><em>Why is this a problem?</em> ConvNets are unable to identify the position of one object relative to another, they can only identify if the object exists in a certain region, or not. This results in difficulty correctly identifying objects that hold spatial relationships between features.</p>
+<p>For example, a bunch of randomly assembled face parts will look like a face to a ConvNet, because all the key features are there:</p>
+<center>
+<img src="https://i.imgur.com/0ZyaPt3.png" />
+</center>
+<h5 align="center">
+Figure 1.2: Translation Invariance
+</h5>
+<p>If Capsule Networks do work as proposed, it should be able to identify that the face parts aren’t in the correct position relative to one another, and label it correctly:</p>
+<center>
+<img src="https://i.imgur.com/mLt9suH.png" />
+</center>
+<h5 align="center">
+Figure 1.3: Translation Equivariance
+</h5>
+<h4 id="problem-2-convnets-require-a-lot-of-data-to-generalize-2.">Problem 2: ConvNets require a <em>lot</em> of data to generalize <a href="https://www.kth.se/social/files/588617ebf2765401cfcc478c/PHensmanDMasko_dkand15.pdf"><sub>[2]</sub></a>.</h4>
+<p>In order for the ConvNets to be translation invariant, it has to learn different filters for each different viewpoints, and in doing so it requires a <strong>lot</strong> of data.</p>
+<h4 id="problem-3-convnets-are-a-bad-representation-of-the-human-vision-system">Problem 3: ConvNets are a bad representation of the human vision system</h4>
+<p>According to Hinton, when a visual stimulus is triggered, the brain has an inbuilt mechanism to <em>“route”</em> low level visual data to parts of the brain where it belives can handle it best. Because ConvNets uses layers of filters to extract high level information from low level visual data, this routing mechanism is absent in it.</p>
+<center>
+<img src="https://i.imgur.com/CVtE4HG.png" />
+</center>
+<h5 align="center">
+Figure 1.4: Humans vs CNN
+</h5>
+<p>Moreover, the human vision system imposes coordinate frames on objects in order to represent them. For example:</p>
+<center>
+<img src="https://i.imgur.com/W8peps6.png" />
+</center>
+<h5 align="center">
+Figure 1.5: Imposing a coordinate frame
+</h5>
+<p>And if we wanted to compare the object in Figure 1.6 to say the letter ‘R’, most people would perform mental rotation on the object to a point of reference which they’re familiar to before making the comparison. This is just not possible in ConvNets due to the nature of their design.</p>
+<center>
+<img src="https://thumbs.gfycat.com/PortlyGracefulBichonfrise-size_restricted.gif" />
+</center>
+<h5 align="center">
+Figure 1.6: Mental Rotation then realizing it’s not ‘R’
+</h5>
+<p>We’ll explore this idea of imposing a bounding rectangle and performing rotations on objects relative to their coordinates later on.</p>
+<h2 id="how-do-capsule-networks-solve-these-issues">How do Capsule Networks solve these issues?</h2>
+<h3 id="inverse-graphics">Inverse Graphics</h3>
+<blockquote>
+<p>You can think of (computer) vision as “Inverse Graphics” - Geoffrey Hinton <sub>[<a href="https://youtu.be/rTawFwUvnLE?t=1750">3</a>]</sub></p>
+</blockquote>
+<p>What is <em>inverse graphics</em>? Simply put, it’s the inverse of how a computer renders an object onto the screen. To go from a mesh object onto pixels on a screen, it takes the pose of the whole object, and multiplies it by a transformation matrix. This outputs the pose of the object’s part in a lower dimension (2D), which is what we see on our screens.</p>
+<center>
+<img src="https://i.imgur.com/DCmDyHl.png" />
+</center>
+<h5 align="center">
+Figure 2.0: Computer Graphics Rendering Process (Simplified)
+</h5>
+<p>So why can’t we do the opposite? Get pixels from a lower dimension, multiply it by the inverse of the transformation matrix to get the pose of the whole object?</p>
+<center>
+<img src="https://i.imgur.com/fOqnQ3C.png" />
+</center>
+<h5 align="center">
+Figure 2.1: Inverse Graphics (Proposed)
+</h5>
+<p>Yes we can (on an approximation level)! And by doing that, we can represent the relationship between the object as a whole and the pose of the part as a matrix of weights. And these matrices of weights are <strong>viewpoint invariant</strong>, meaning that however much the pose of the part has changed we can get back the pose of the whole using the same matrix of weights.</p>
+<p><strong>This gives us complete independence between the viewpoints of the object in a matrix of weights. The translation invariance is now represented in the matrix of weights, and not in the neural activity</strong>.</p>
+<h3 id="where-do-we-get-the-matrix-of-weights-to-represent-the-relationship">Where do we get the matrix of weights to represent the relationship?</h3>
+<center>
+<img src="https://i.imgur.com/2fHUQrQ.png" />
+</center>
+<h5 align="center">
+Figure 2.2 Extract from Dynamic Routing Between Capsules <sub>[<a href="https://arxiv.org/pdf/1710.09829.pdf">4</a>]</sub>
+</h5>
+<p>In <a href="https://arxiv.org/pdf/1710.09829.pdf">Hinton’s Paper</a> he describes that the Capsule Networks use a reconstruction loss as a regularization method, similiar to how an autoencoder operates. <strong>Why is this significant?</strong></p>
+<center>
+<img src="https://i.imgur.com/eCmc5fR.jpg">
+</center>
+<h5 align="center">
+Figure 2.3 Autoencoder Architecture
+</h5>
+<p>In order to reconstruct the input from a lower dimensional space, the Encoder and Decoder needs to <strong>learn a good matix representation to relate the relationship between the latent space and the input</strong>, <em>sounds familiar</em>?</p>
+<p>To summarize, by using the reconstruction loss as a regularizer, the Capsule Network is able to learn a global linear manifold between a whole object and the pose of the object as a matrix of weights via unsupervised learning. As such, the <em>translation invariance</em> is encapsulated in the matrix of weights, and not during neural activity, making the neural network <em>translation equivariance</em>. Therefore, we are in some sense, performing a ‘mental rotation and translation’ of the image when it gets multiplied by the global linear manifold!</p>
+<h3 id="dynamic-routing">Dynamic Routing</h3>
+<p>Routing is the act of relaying information to another actor who can more effectively process it. ConvNets currently perform routing via pooling layers, most commonly being <em>max pooling</em>.</p>
+<center>
+<img src="https://qph.ec.quoracdn.net/main-qimg-8afedfb2f82f279781bfefa269bc6a90" />
+</center>
+<h5 align="center">
+Figure 3.0: Max Pooling with a 2x2 Kernel and 2 Stride
+</h5>
+<p>Max pooling is a very primitive way to do routing as it only attends to the most active neuron in the pool. Capsule Networks is different as it tries to send the information to the capsule above it that is best at dealing with it.</p>
+<center>
+<img src="https://i.imgur.com/Vd9kw7m.png" />
+</center>
+<h5 align="center">
+Figure 3.1: Extract from Dynamic Routing Between Capsules <sub>[<a href="https://arxiv.org/pdf/1710.09829.pdf">4</a>]</sub>
+</h5>
+<h2 id="conclusion">Conclusion</h2>
+<p>Using a novel architecture that mimics the human vision system, Capsule Networks strives for <em>translation equivariance</em> instead of <em>translation invariance</em>, allowing it to generalize to a greater degree from different view points with less training data.</p>
+<p>You can check out a <a href="https://gist.github.com/kendricktan/9a776ec6322abaaf03cc9befd35508d4">barebone implementation of Capsule Network here</a>, which is just a cleaned up version of <a href="https://github.com/gram-ai/capsule-networks">gram.ai’s implementaion</a>.</p>
+<hr />
+<h2 id="references">References</h2>
+<ol style="list-style-type: decimal">
+<li><a href="https://aboveintelligent.com/ml-cnn-translation-equivariance-and-invariance-da12e8ab7049">CNN: Translation Equivariance and Invariance</a></li>
+<li><a href="https://www.kth.se/social/files/588617ebf2765401cfcc478c/PHensmanDMasko_dkand15.pdf">The Impact of Imbalanced Training Data for Convolutional Neural Networks</a></li>
+<li><a href="https://youtu.be/rTawFwUvnLE">What is wrong with Convolutional Neural Networks?</a></li>
+<li><a href="https://arxiv.org/pdf/1710.09829.pdf">Dynamic Routing Between Capsules</a></li>
+</ol>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>

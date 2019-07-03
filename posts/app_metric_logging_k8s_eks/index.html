@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>App Metric Logging with Kubernetes, Prometheus, Grafana, and Helm on EKS - Zero to Hero | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>App Metric Logging with Kubernetes, Prometheus, Grafana, and Helm on EKS - Zero to Hero</h1>
+             <div class="info">
+    Posted on 2019-04-03    
+    
+        by Kendrick Tan
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<h1 id="prelude">Prelude</h1>
+<p>I’ve been trying to find a quick and easy example on how to setup application metrics logging on kubernetes using prometheus and grafana, from someone with minimal kubernetes experience.</p>
+<p>However after scouring the web, the examples I could find had lots of assumed knowledge on how kubernetes and its tooling worked, or just overly verbose.</p>
+<p>This article is more for me as a reference guide on how to setup application monitoring in Kubernetes using prometheus, and grafana with the help of Helm on EKS.</p>
+<p>Assumptions:</p>
+<ul>
+<li>Familiar with AWS and Cloudformation / Terraform</li>
+<li>Familiar with Docker</li>
+<li>Know basic JavaScript</li>
+</ul>
+<p>Lets go!</p>
+<h1 id="steps">Steps</h1>
+<h2 id="setup-eks-cluster">1. Setup EKS Cluster</h2>
+<p>Follow the <a href="https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html">AWS EKS quickstart guide</a> to setup your EKS cluster.</p>
+<p>If you’ve correctly followed the guide, running <code>kubectl cluster-info</code> should return you something this:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">kubectl</span> cluster-info
+<span class="ex">Kubernetes</span> master is running at https://<span class="op">&lt;</span>cluster-id<span class="op">&gt;</span>.sk1.us-east-1.eks.amazonaws.com
+<span class="ex">CoreDNS</span> is running at https://<span class="op">&lt;</span>cluster-id<span class="op">&gt;</span>.sk1.us-east-1.eks.amazonaws.com/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+<span class="ex">To</span> further debug and diagnose cluster problems, use <span class="st">'kubectl cluster-info dump'</span>.</code></pre></div>
+<h2 id="dockerize-custom-app">2. Dockerize Custom App</h2>
+<p>Make sure you have an Docker registry server, if you don’t, <a href="https://console.aws.amazon.com/ecr/repositories">you can create one on AWS here</a>.</p>
+<p>As for the app and the metrics to be displayed, I’ve chosen to use a simple node app that counts how many times the <code>/metrics</code> endpoint has been polled:</p>
+<h3 id="app.js"><code>app.js</code></h3>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> http <span class="op">=</span> <span class="at">require</span>(<span class="st">'http'</span>)<span class="op">;</span>
+
+<span class="kw">var</span> callcount <span class="op">=</span> <span class="dv">0</span><span class="op">;</span>
+
+<span class="kw">var</span> handleRequest <span class="op">=</span> <span class="kw">function</span> (request<span class="op">,</span> response) <span class="op">{</span>
+    <span class="cf">if</span> (<span class="va">request</span>.<span class="at">url</span> <span class="op">==</span> <span class="st">'/metrics'</span>) <span class="op">{</span>
+        callcount <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span>
+
+        <span class="kw">let</span> text <span class="op">=</span> <span class="vs">`</span>
+<span class="vs"># HELP call_count Number of calls to this endpoint</span>
+<span class="vs"># TYPE call_count gauge</span>
+<span class="vs">call_count </span><span class="sc">${</span>callcount<span class="sc">}</span>
+<span class="vs">        `</span>
+
+        <span class="va">response</span>.<span class="at">writeHead</span>(<span class="dv">200</span>)
+        <span class="va">response</span>.<span class="at">end</span>(text)
+    <span class="op">}</span>
+
+    <span class="cf">else</span> <span class="op">{</span>
+        <span class="va">response</span>.<span class="at">writeHead</span>(<span class="dv">200</span>)<span class="op">;</span>
+        <span class="va">response</span>.<span class="at">end</span>(<span class="vs">`Hello World from App </span><span class="sc">${</span><span class="va">process</span>.<span class="va">env</span>.<span class="at">APP_NAME</span> <span class="op">||</span> <span class="st">&quot;&lt;No Name!&gt;&quot;</span><span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span>
+    <span class="op">}</span>
+<span class="op">};</span>
+
+<span class="kw">var</span> www <span class="op">=</span> <span class="va">http</span>.<span class="at">createServer</span>(handleRequest)<span class="op">;</span>
+
+<span class="va">www</span>.<span class="at">listen</span>(<span class="dv">8080</span>)<span class="op">;</span></code></pre></div>
+<h3 id="dockerfile"><code>Dockerfile</code></h3>
+<pre class="docker"><code>FROM node:6.14.2
+EXPOSE 8080
+COPY app.js .
+CMD node app.js</code></pre>
+<p>Save those two files to a a directory, build the docker image and upload the image to your corresponding registry.</p>
+<h2 id="deploy-custom-app-on-eks">3. Deploy Custom App on EKS</h2>
+<p>Deploying your dockerized app onto the kubernetes cluster made in step 1 is straightforward: save the file <code>custom-app-deployment.yml</code> below (make sure you change <code>&lt;image-url&gt;</code> to your actual image-url) to a directory and run:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">kubectl</span> create namespace custom-app
+$ <span class="ex">kubectl</span> apply -f custom-app-deployment.yml</code></pre></div>
+<h3 id="custom-app-deployment.yml"><code>custom-app-deployment.yml</code></h3>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="ot">---</span>
+<span class="fu">apiVersion:</span><span class="at"> v1</span>
+<span class="fu">kind:</span><span class="at"> Service</span>
+<span class="fu">metadata:</span>
+  <span class="fu">namespace:</span><span class="at"> custom-app</span>
+  <span class="fu">name:</span><span class="at"> my-custom-app</span>
+  <span class="fu">labels:</span>
+    <span class="fu">app:</span><span class="at"> my-custom-app</span>
+<span class="fu">spec:</span>
+  <span class="fu">type:</span><span class="at"> NodePort</span>
+  <span class="fu">ports:</span>
+  <span class="kw">-</span> <span class="fu">protocol:</span><span class="at"> TCP</span>
+    <span class="fu">port:</span><span class="at"> 80</span>
+    <span class="fu">targetPort:</span><span class="at"> 8080</span>
+    <span class="fu">name:</span><span class="at"> http</span>
+  <span class="fu">selector:</span>
+    <span class="fu">app:</span><span class="at"> my-custom-app</span>
+<span class="ot">---</span>
+<span class="fu">apiVersion:</span><span class="at"> apps/v1</span>
+<span class="fu">kind:</span><span class="at"> Deployment</span>
+<span class="fu">metadata:</span>
+  <span class="fu">name:</span><span class="at"> my-custom-app</span>
+  <span class="fu">namespace:</span><span class="at"> custom-app</span>
+  <span class="fu">labels:</span>
+    <span class="fu">app:</span><span class="at"> my-custom-app</span>
+    <span class="fu">tier:</span><span class="at"> backend</span>
+    <span class="fu">version:</span><span class="at"> v1</span>
+<span class="fu">spec:</span>
+  <span class="fu">selector:</span>
+    <span class="fu">matchLabels:</span>
+      <span class="fu">app:</span><span class="at"> my-custom-app</span>
+  <span class="fu">replicas:</span><span class="at"> 1</span>
+  <span class="fu">template:</span>
+    <span class="fu">metadata:</span>
+      <span class="fu">labels:</span>
+        <span class="fu">app:</span><span class="at"> my-custom-app</span>
+    <span class="fu">spec:</span>
+      <span class="fu">containers:</span>
+      <span class="kw">-</span> <span class="fu">name:</span><span class="at"> my-custom-app-container</span>
+        <span class="fu">image:</span><span class="at"> &lt;image-url&gt;</span>
+        <span class="fu">ports:</span>
+        <span class="kw">-</span> <span class="fu">containerPort:</span><span class="at"> 8080</span>
+        <span class="fu">env:</span>
+        <span class="kw">-</span> <span class="fu">name:</span><span class="at"> APP_NAME</span>
+          <span class="fu">value:</span><span class="at"> CUSTOM_APP</span></code></pre></div>
+<h2 id="installing-and-configuring-helm">4. Installing and Configuring Helm</h2>
+<p>As Helm is a static binary, <a href="https://github.com/helm/helm">you can simply download the release for your relevant OS</a> and include it into your <code>PATH</code>.</p>
+<p>Helm in short is like a package manager for Kubernetes: just like how you run <code>apt-get install &lt;package&gt;</code> to install a package onto debian-based systems, you run <code>helm install stable/&lt;application&gt;</code> to install said application onto your kubernetes cluster.</p>
+<p>We’re going to deploy the <code>prometheus</code> and <code>grafana</code> packages from the helm repository to enable metrics logging and monitoring of our custom node.js application.</p>
+<p>Before using helm, we’ll need to install a package inside of our kubernetes cluster called <code>tiller</code> to interact with kubernetes’ API server in order to perform installations, updates, queries, etc.</p>
+<p>Tiller can be installed onto our kubernetes cluster using the following commands:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">kubectl</span> -n kube-system create serviceaccount tiller
+
+$ <span class="ex">kubectl</span> create clusterrolebinding tiller \
+    --clusterrole=cluster-admin \
+    --serviceaccount=kube-system:tiller
+
+$ <span class="ex">helm</span> init --service-account tiller</code></pre></div>
+<p>We can now update helm:</p>
+<pre><code>$ helm repo update</code></pre>
+<h2 id="installing-and-configuring-prometheus">5. Installing And Configuring Prometheus</h2>
+<p>Just to be tidy, we’re going to install promethus and grafana under the <code>monitoring</code> namespace, before that we need to first make that namespace in our kubernetes cluster:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">kubectl</span> create namespace monitoring</code></pre></div>
+<p>We can now install Prometheus onto our server</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">helm</span> install stable/prometheus \
+      --namespace monitoring \
+      --name prometheus</code></pre></div>
+<p>I would like to add a custom job into prometheus to log <code>my-custom-app</code> deployed in step 1, to do that we need add the following lines to the <code>scrape_configs</code> section of our current prometheus configmap config file:</p>
+<h3 id="extra_job.yaml"><code>extra_job.yaml</code></h3>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="kw">-</span> <span class="fu">job_name:</span><span class="at"> my-custom-app</span>
+  <span class="fu">scrape_interval:</span><span class="at"> 10s</span>
+  <span class="fu">kubernetes_sd_configs:</span>
+    <span class="kw">-</span> <span class="fu">role:</span><span class="at"> pod</span>
+  <span class="fu">relabel_configs:</span>
+    <span class="kw">-</span> <span class="fu">source_labels:</span><span class="at"> </span><span class="kw">[</span>__meta_kubernetes_namespace<span class="kw">]</span>
+      <span class="fu">action:</span><span class="at"> replace</span>
+      <span class="fu">target_label:</span><span class="at"> k8s_namespace</span>
+    <span class="kw">-</span> <span class="fu">source_labels:</span><span class="at"> </span><span class="kw">[</span>__meta_kubernetes_pod_name<span class="kw">]</span>
+      <span class="fu">action:</span><span class="at"> replace</span>
+      <span class="fu">target_label:</span><span class="at"> k8s_pod_name</span>
+    <span class="kw">-</span> <span class="fu">source_labels:</span><span class="at"> </span><span class="kw">[</span>__address__<span class="kw">]</span>
+      <span class="fu">action:</span><span class="at"> replace</span>
+      <span class="fu">regex:</span><span class="at"> ([^:]+)(?::\d+)?</span>
+      <span class="fu">replacement:</span><span class="at"> ${1}:80</span>
+      <span class="fu">target_label:</span><span class="at"> __address__</span>
+    <span class="kw">-</span> <span class="fu">source_labels:</span><span class="at"> </span><span class="kw">[</span>__meta_kubernetes_pod_label_app<span class="kw">]</span>
+      <span class="fu">action:</span><span class="at"> keep</span>
+      <span class="fu">regex:</span><span class="at"> my-custom-app</span></code></pre></div>
+<p>To get the current prometheus configmap config file:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">kubectl</span> -n monitoring get cm prometheus-server -o jsonpath=<span class="st">&quot;{ .data.prometheus</span><span class="dt">\\</span><span class="st">.yml }&quot;</span> <span class="op">&gt;</span> prom.yaml</code></pre></div>
+<p>Then use your favorite text editor and add the contents from <code>extra_job.yml</code> into the scrap_configs section of <code>prom.yml</code>.</p>
+<p>We’ll redeploy a new configmap resource for our prometheus server:</p>
+<pre><code>$ kubectl -n monitoring delete cm prometheus-server
+$ kubectl -n monitoring create cm prometheus-server --from-file=prometheus.yml=prom.yml</code></pre>
+<p>To see if the configmap was updated correctly, we can proxy into the prometheus server:</p>
+<pre><code>$ export POD_NAME=$(kubectl get pods --namespace monitoring -l &quot;app=prometheus,component=server&quot; -o jsonpath=&quot;{.items[0].metadata.name}&quot;)
+$ kubectl --namespace monitoring port-forward $POD_NAME 9090</code></pre>
+<p>Access <code>localhost:9090</code> on your browser, then go to <code>status &gt; targets</code></p>
+<div style="text-align: center;">
+<p><img src="https://i.imgur.com/M7ovUEM.png" /></p>
+</div>
+<p>And you should find a <code>my-custom-app</code> section with 1 node up</p>
+<div style="text-align: center;">
+<p><img src="https://i.imgur.com/N0GXn6T.png" /></p>
+</div>
+<p>If you go back to the main page on <code>localhost:3000</code> and query <code>call_count</code>, you should be greated with something like this (don’t worry if the line isn’t long enough, as long as there’s a line there, then it works):</p>
+<div style="text-align: center;">
+<p><img src="https://i.imgur.com/wcSlL13.png" /></p>
+</div>
+<h2 id="installing-and-configuring-grafana">6. Installing and Configuring Grafana</h2>
+<p>We want grafana to automatically pick up our prometheus data source on deployment. To do so, we need to create two things:</p>
+<ul>
+<li>A custom configmap resource</li>
+<li>A sidecar to load all the data sources into grafana on provision</li>
+</ul>
+<p>Save <code>configmap.yml</code> from below and deploy it using the command:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">kubectl</span> apply -f config.yml
+$ <span class="ex">kubectl</span> get configmaps -n monitoring
+<span class="ex">NAME</span>                            DATA   AGE
+<span class="ex">...</span>
+<span class="ex">prometheus-grafana-datasource</span>   1      1d
+<span class="ex">...</span></code></pre></div>
+<h3 id="configmap.yml"><code>configmap.yml</code></h3>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="fu">apiVersion:</span><span class="at"> v1</span>
+<span class="fu">kind:</span><span class="at"> ConfigMap</span>
+<span class="fu">metadata:</span>
+  <span class="fu">name:</span><span class="at"> prometheus-grafana-datasource</span>
+  <span class="fu">namespace:</span><span class="at"> monitoring</span>
+  <span class="fu">labels:</span>
+    <span class="fu">grafana_datasource:</span><span class="at"> </span><span class="st">'1'</span>
+<span class="fu">data:</span>
+  <span class="fu">datasource.yaml:</span><span class="at"> |-</span>
+    <span class="fu">apiVersion:</span><span class="at"> 1</span>
+    <span class="fu">datasources:</span>
+    <span class="kw">-</span> <span class="fu">name:</span><span class="at"> Prometheus</span>
+      <span class="fu">type:</span><span class="at"> prometheus</span>
+      <span class="fu">access:</span><span class="at"> proxy</span>
+      <span class="fu">orgId:</span><span class="at"> 1</span>
+      <span class="fu">url:</span><span class="at"> http://prometheus-server.monitoring.svc.cluster.local</span></code></pre></div>
+<p>We now need to create our sidecar to automatically load the datasource on startup:</p>
+<p>Save <code>values.yml</code> to a directory and run the following command:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">helm</span> install stable/grafana \
+    -f values.yml \
+    --namespace monitoring <span class="dt">\ </span>
+    <span class="ex">--name</span> grafana</code></pre></div>
+<h3 id="values.yml"><code>values.yml</code></h3>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="fu">sidecar:</span>
+  <span class="fu">image:</span><span class="at"> xuxinkun/k8s-sidecar:0.0.7</span>
+  <span class="fu">imagePullPolicy:</span><span class="at"> IfNotPresent</span>
+  <span class="fu">datasources:</span>
+    <span class="fu">enabled:</span><span class="at"> true</span>
+    <span class="fu">label:</span><span class="at"> grafana_datasource</span></code></pre></div>
+<p>Make sure grafana is running</p>
+<pre><code># kubectl get pods -n monitoring
+NAME                                             READY   STATUS    RESTARTS   AGE
+...
+grafana-8c7466c85-d7gl2                          1/1     Running   0          4m
+...</code></pre>
+<p>We can now proxy into grafana on port <code>3000</code>, but first we need the password to access the dashboard:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">kubectl</span> get secret --namespace monitoring grafana -o jsonpath=<span class="st">&quot;{.data.admin-password}&quot;</span> <span class="kw">|</span> <span class="ex">base64</span> --decode <span class="kw">;</span> <span class="bu">echo</span></code></pre></div>
+<p>Now create the proxy:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="bu">export</span> <span class="va">POD_NAME=$(</span><span class="ex">kubectl</span> get pods --namespace monitoring -l <span class="st">&quot;app=grafana,release=grafana&quot;</span> -o jsonpath=<span class="st">&quot;{.items[0].metadata.name}&quot;</span><span class="va">)</span>
+$ <span class="ex">kubectl</span> --namespace monitoring port-forward <span class="va">$POD_NAME</span> 3000</code></pre></div>
+<p>Access <code>localhost:3000</code> on your browser, enter in username as <code>admin</code> and password as what you got from the previous command and you should be able to <strong>configure</strong> your dashboard to look something like the image below!</p>
+<div style="text-align: center;">
+<p><img src="https://i.imgur.com/kUBEB5I.png" /></p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Understanding basic kubernetes automatically grants you +50 neckbeard and sysadmin skills.</p>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>

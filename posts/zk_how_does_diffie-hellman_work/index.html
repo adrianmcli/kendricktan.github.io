@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>How Does Diffie-Hellman Work? | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } },
+        tex2jax: {
+          inlineMath: [ ['\\(','\\)'] ],
+          processEscapes: true,
+        },
+        "HTML-CSS": {                  
+          linebreaks: {                  
+            automatic: true                   
+          }                  
+        }
+      });
+    </script>    
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full">
+    </script>
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>How Does Diffie-Hellman Work?</h1>
+             <div class="info">
+    Posted on 2019-01-06    
+    
+        by Kendrick Tan
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<h1 id="motivation">Motivation</h1>
+<p>In my quest to understand <a href="https://ethresear.ch/t/zero-knowledge-proofs-starter-pack/4519">zero</a> <a href="https://zkp.science/">knowledge</a> <a href="https://www.zeroknowledge.fm/">proofs</a> from the ground up, I’ve decided to go back to the basics, and <em>really</em> understand how everyday cryptography tools work, not just how to use them.</p>
+<p>In this post, I’ll attempt to explain how <em>and</em> why the diffie hellman key exchange protocol works, along with proofs and a working example.</p>
+<p><strong>The examples are purely for educational purposes only!</strong></p>
+<h1 id="introduction">Introduction</h1>
+<p>The Diffie-Hellman key exchange protocol is an algorithm that allows two parties to generate a unique secret key <em>together</em>. <strong>No sensitive information is shared between the two parties during this process.</strong></p>
+<h1 id="background-maths">Background Maths</h1>
+<p>Before proceeding I would like to brush up on some background maths and theory. Some of which you might remember, some of which you might have forgotten.</p>
+<h2 id="modulo-mathematics">Modulo Mathematics</h2>
+<p>In a nutshell, modular maths is a system where numbers “wraps-around” upon exceeding a certain value. Most of us do this everyday when converting from 24-hour format to 12-hour format – 14:00 becomes 2:00pm.</p>
+<p><strong>Example:</strong> <span class="math inline">14 <em>m</em><em>o</em><em>d</em> 12 = 2</span></p>
+<p>The set of integers that exists in <span class="math inline"><em>m</em><em>o</em><em>d</em> <em>p</em></span> is <span class="math inline">0, 1, 2...<em>p</em> − 1</span>. i.e.</p>
+<p class="center">
+<br /><span class="math display">ℤ<sub>𝕡</sub> = {0, 1, 2, 3, ..., <em>p</em> − 1}</span><br />
+</p>
+<p>Modulo mathematics is significant in Diffie-Hellman (and cryptography in general) because it allows us to create finite fields of integers, which is the foundation of today’s public-key cryptosystems.</p>
+<h2 id="exponent-rules">Exponent Rules</h2>
+<p><br /><span class="math display">$$
+\begin{align}
+{(g^a)}^b &amp;= g^{ab} \newline
+(g^a\ mod\ p)^{b}\ mod\ p &amp;= g^{ab}\ mod\ p \label{eq:exponent_mod_rule}
+\end{align}
+$$</span><br /></p>
+<h2 id="greatest-common-divisor-gcd">Greatest Common Divisor (GCD)</h2>
+<blockquote>
+<p>The greatest common divisor between two numbers is the largest integer that will divide both numbers.</p>
+</blockquote>
+<p><strong>Example:</strong> gcd(3, 9) = 3.</p>
+<p>If one of the numbers in the gcd is a prime number, then the gcd will <em>always</em> be 1. Prime numbers are used heavily in cryptography because they can’t be factorized (i.e. the gcd of the prime number with any other number is 1), making the process of cracking the code that much harder.</p>
+<h1 id="diffie-hellman">Diffie-Hellman</h1>
+<h2 id="algorithm">Algorithm</h2>
+<p>The diffie-hellman key exchange protocol goes like so:</p>
+<ol style="list-style-type: decimal">
+<li>Generator (<span class="math inline"><em>g</em></span>) and base (<span class="math inline"><em>p</em></span>) are given a random prime number</li>
+<li>Alice generates a secret key (<span class="math inline"><em>s</em><em>k</em><sub><em>a</em></sub></span>) with a random value</li>
+<li>Alice generates a public key (<span class="math inline"><em>p</em><em>k</em><sub><em>a</em></sub></span>) from the secret key (<span class="math inline"><em>s</em><em>k</em><sub><em>a</em></sub></span>) using the formula: <span class="math inline"><em>p</em><em>k</em><sub><em>a</em></sub> = <em>g</em><sup><em>s</em><em>k</em><sub><em>a</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span></li>
+<li>Bob does the same thing – he generates <span class="math inline"><em>s</em><em>k</em><sub><em>a</em></sub></span> and derives <span class="math inline"><em>p</em><em>k</em><sub><em>a</em></sub></span> from it</li>
+<li>Alice sends <span class="math inline"><em>p</em><em>k</em><sub><em>a</em></sub></span> to Bob, and Bob sends <span class="math inline"><em>p</em><em>k</em><sub><em>b</em></sub></span> to Alice</li>
+<li>Alice generates the shared secret key using the formula: <span class="math inline"><em>p</em><em>k</em><sub><em>b</em></sub><sup><em>s</em><em>k</em><sub><em>a</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span></li>
+<li>Bob generates the shared secret key using the formula: <span class="math inline"><em>p</em><em>k</em><sub><em>a</em></sub><sup><em>s</em><em>k</em><sub><em>b</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span></li>
+</ol>
+<p>It might not seem like it, but the keys generated from steps 6 and 7 are actually the same! Why is that so though?</p>
+<h2 id="why-does-diffie-hellman-work">Why Does Diffie-Hellman Work?</h2>
+Recall that the public keys are generated using the following formula:
+<p class="center">
+<br /><span class="math display"><em>p</em><em>k</em><sub><em>a</em></sub> = <em>g</em><sup><em>s</em><em>k</em><sub><em>a</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span><br /> <br /><span class="math display"><em>p</em><em>k</em><sub><em>b</em></sub> = <em>g</em><sup><em>s</em><em>k</em><sub><em>b</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span><br />
+</p>
+And that the shared secret key is generated using these formulas:
+<p class="center">
+<br /><span class="math display"><em>S</em><sub><em>a</em><em>l</em><em>i</em><em>c</em><em>e</em></sub> = <em>p</em><em>k</em><sub><em>a</em></sub><sup><em>s</em><em>k</em><sub><em>b</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span><br /> <br /><span class="math display"><em>S</em><sub><em>b</em><em>o</em><em>b</em></sub>   = <em>p</em><em>k</em><sub><em>b</em></sub><sup><em>s</em><em>k</em><sub><em>a</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span><br />
+</p>
+If we substitute <span class="math inline"><em>p</em><em>k</em><sub><em>a</em></sub></span> for <span class="math inline"><em>g</em><sup><em>s</em><em>k</em><sub><em>a</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span> and <span class="math inline"><em>p</em><em>k</em><sub><em>b</em></sub></span> for <span class="math inline"><em>g</em><sup><em>s</em><em>k</em><sub><em>b</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span>, we get:
+<p class="center">
+<br /><span class="math display"><em>S</em><sub><em>a</em><em>l</em><em>i</em><em>c</em><em>e</em></sub> = (<em>g</em><sup><em>s</em><em>k</em><sub><em>a</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em>)<sup><em>s</em><em>k</em><sub><em>b</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span><br /> <br /><span class="math display"><em>S</em><sub><em>b</em><em>o</em><em>b</em></sub>   = (<em>g</em><sup><em>s</em><em>k</em><sub><em>b</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em>)<sup><em>s</em><em>k</em><sub><em>a</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span><br />
+</p>
+We can simplify that equation using the exponent rule (\ref{eq:exponent_mod_rule}), which gives us:
+<p class="center">
+<br /><span class="math display"><em>S</em><sub><em>a</em><em>l</em><em>i</em><em>c</em><em>e</em></sub> = <em>g</em><sup><em>s</em><em>k</em><sub><em>a</em></sub> ⋅ <em>s</em><em>k</em><sub><em>b</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span><br /> <br /><span class="math display"><em>S</em><sub><em>b</em><em>o</em><em>b</em></sub>   = <em>g</em><sup><em>s</em><em>k</em><sub><em>b</em></sub> ⋅ <em>s</em><em>k</em><sub><em>a</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span><br />
+</p>
+Since multiplication is associative, we end up with the same result:
+<p class="center">
+<br /><span class="math display"><em>g</em><sup><em>s</em><em>k</em><sub><em>b</em></sub> ⋅ <em>s</em><em>k</em><sub><em>a</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em> = <em>g</em><sup><em>s</em><em>k</em><sub><em>a</em></sub> ⋅ <em>s</em><em>k</em><sub><em>b</em></sub></sup> <em>m</em><em>o</em><em>d</em> <em>p</em></span><br />
+</p>
+<h2 id="example-python">Example (Python)</h2>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">&quot;&quot;&quot;</span>
+<span class="co">2019-01-06 Kendrick Tan</span>
+<span class="co">Diffie-Hellman</span>
+<span class="co">Diffie-Hellman is a process that allows two parties to</span>
+<span class="co">generate a unique secret key _together_ while exchanging</span>
+<span class="co">information in plain text.</span>
+<span class="co">This script is purely for educational purposes only.</span>
+<span class="co">&quot;&quot;&quot;</span>
+
+<span class="co"># 1. We need to first establish our generator (g) and</span>
+<span class="co"># base (p) (both of which are arbitrarily large prime numbers)</span>
+p <span class="op">=</span> <span class="dv">7</span>
+g <span class="op">=</span> <span class="dv">11</span>
+
+<span class="co"># 2. Alice creates a secret key with a random value</span>
+secret_a <span class="op">=</span> <span class="dv">8</span>
+
+<span class="co"># 3. Alice generates a public key from the secret key using</span>
+<span class="co"># the following formula: public = g^secret mod p</span>
+public_a <span class="op">=</span> g<span class="op">**</span>secret_a <span class="op">%</span> p
+
+<span class="co"># 4. Bob does the same thing</span>
+secret_b <span class="op">=</span> <span class="dv">4</span>
+public_b <span class="op">=</span> g<span class="op">**</span>secret_b <span class="op">%</span> p
+
+<span class="co"># 5. Alice sends her public key to Bob, and Bob does the same thing</span>
+<span class="co"># Alice and Bob will now generate the shared secret key using</span>
+<span class="co"># the following formula: shared_secret = public^secret mod p</span>
+
+shared_secret_alice <span class="op">=</span> public_b<span class="op">**</span>secret_a <span class="op">%</span> p
+shared_secret_bob   <span class="op">=</span> public_a<span class="op">**</span>secret_b <span class="op">%</span> p
+
+<span class="co"># 6. Both of the generated shared secrets should contain the same value</span>
+<span class="cf">if</span> shared_secret_alice <span class="op">==</span> shared_secret_bob:
+    <span class="bu">print</span>(<span class="st">'Shared secret generation successful!'</span>)
+<span class="cf">else</span>:
+    <span class="bu">print</span>(<span class="st">'Shared secret generation failed :('</span>)
+
+<span class="co">&quot;&quot;&quot;</span>
+<span class="co">This works because of math :-)</span>
+<span class="co">Recall:</span>
+<span class="co">Exponent rule: (g^a)^b = g^(a*b)</span>
+<span class="co">Modulus rule: (g^a mod p)^b mod p = g^(a*b) mod p</span>
+<span class="co">So,</span>
+<span class="co">public_a = g^secret_a mod p</span>
+<span class="co">shared_secret_bob   = public_a^secret_b mod p</span>
+<span class="co">                    = (g^secret_a mod p)^secret_b mod p</span>
+<span class="co">                    = g^(secret_a * secret_b) mod p</span>
+<span class="co">shared_secret_alice = public_b^secret_a mod p</span>
+<span class="co">                    = (g^secret_b mod p)^secret_a mod p</span>
+<span class="co">                    = g^(secret_b * secret_a) mod p</span>
+<span class="co">&quot;&quot;&quot;</span></code></pre></div>
+<h1 id="conclusion">Conclusion</h1>
+<p>You don’t need to be a math wizard to understand cryptography.</p>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>

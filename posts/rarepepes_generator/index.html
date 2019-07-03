@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>Rare Pepe Generator | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>Rare Pepe Generator</h1>
+             <div class="info">
+    Posted on 2017-05-24    
+    
+        by Kendrick Tan
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<h2 id="makerarepepes.me"><a href="https://makerarepepes.me">makerarepepes.me</a></h2>
+<p>Pepes, can’t get enough of them, that’s why I made a <a href="https://makerarepepes.me">website</a> that turns rough sketches of pepes into a rare pepe (unique to your sketch!).</p>
+<p><img src="https://i.imgur.com/O5MUs2h.png" /></p>
+<p>The approach for this is very similar to how I did my <a href="https://kendricktan.github.io/draw-like-bob-ross-with-pytorch.html">Bob Ross styled paintings</a>, the only difference is the architecture of the network and the dataset.</p>
+<hr />
+<h2 id="network">Network</h2>
+<p>The network uses the <a href="https://arxiv.org/abs/1611.07004">pix2pix</a> architecture, so if you would like further reading on it, I would highly recommend reading this <a href="https://affinelayer.com/pixsrv/">blog post by Christopher Hesse</a>.</p>
+<p>TL;DR version would be that pix2pix is able to translate an image from <code>domain A</code> to <code>domain B</code>, in other words a rough pepe outline/sketch into a real pepe.</p>
+<hr />
+<h2 id="dataset">Dataset</h2>
+<p>To translate a rough pepe sketch into a pepe, I needed some data. Luckily for me I found a decently sized <a href="https://archive.org/details/PepeImgurAlbum">dataset of rare pepes</a>. However, some of them were unusable as it contained too much unnecessary information:</p>
+<p><img src="http://i3.kym-cdn.com/photos/images/original/001/047/653/4df.jpg" /></p>
+<p>So, I wrote a <a href="https://github.com/kendricktan/rarepepes/blob/master/data/clean_dataset.py">script</a> that aids my in manually cleaning up that dataset. It displays the original input image on the left, and the image with <a href="http://docs.opencv.org/trunk/da/d22/tutorial_py_canny.html">canny edge detection</a> applied on the right.</p>
+<p><img src="https://i.imgur.com/Diq9iiX.png" /></p>
+<p>If its acceptable just press <code>Y</code> and it saves both of the image into a designated output folder, else press <code>N</code>.</p>
+<hr />
+<h3 id="check-out-the-github-repo-for-more-info">Check out the <a href="https://github.com/kendricktan/rarepepes">github repo</a> for more info</h3>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>Introducing Heiswap - An Ethereum Mixer (Live on Ropsten!) | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>Introducing Heiswap - An Ethereum Mixer (Live on Ropsten!)</h1>
+             <div class="info">
+    Posted on 2019-07-03    
+    
+        by Kendrick Tan
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<h1 id="motivation">Motivation</h1>
+<p>I was looking for a new project to work on, stumbled on <a href="https://hackmd.io/@HWeNw8hNRimMm2m2GH56Cw/rJj9hEJTN?type=view">Vitalik’s HackMD post</a>, and thought why not? It sounded like fun, and so <a href="https://heiswap.exchange">heiswap.exchange</a> was born.</p>
+<h2 id="quicklinks">Quicklinks</h2>
+<ul>
+<li><a href="https://ropsten.etherscan.io/address/0xbbbf35a4485992520557ae729e21ba35aab178d7">Smart contract deployed on Ropsten</a></li>
+<li><a href="https://github.com/kendricktan/heiswap-dapp">Solidity + WebApp Source Code</a></li>
+</ul>
+<h1 id="introduction">Introduction</h1>
+<p>Heiswap (黑 swap) is an Ethereum mixer that allows users to ‘wash’ their ETH in a confidential manner (i.e. who the sender sends money to is hidden). At this point in time (3rd July 2019), Heiswap is only able to mask the link between senders and their corresponding recipients, and requires participants to send ETH in fixed denominations.</p>
+<p>This is because if user A deposits some oddly specific number of ETH, say <code>1.3256</code>, and user B withdraws an amount similar to that (e.g. <code>1.325</code>, due to fees) around the same time frame, then it is very easy to link user A to user B.</p>
+<p><strong>To “wash” their Ethereum, a user simply deposits a fixed amount of Ethereum into the heiswap smart contract, wait until there are more participants in the pool and then withdraws it from the smart contract.</strong></p>
+<h2 id="eli5-how-does-it-work">ELI5 How Does It Work</h2>
+<p>We gather a group of <em>N</em> people (<code>senders</code>), who want to transfer 2 Eth to another group of <em>N</em> people (<code>receivers</code>). We get the <code>senders</code> to each deposit 2 Eth into a pot, and then get the <code>receivers</code> to each take out 2 Eth from the pot. Using this process, we have no way of telling who sent money to whom, only that the swapping of money took place.</p>
+<p>Under normal circumstances we need an escrow to keep track of additional information (e.g. who’s taken money from the pot and who hasn’t), but this logic can be programmed into the smart contract, which is what we’ve done.</p>
+<h1 id="usage">Usage</h1>
+<p>Heiswap is live right now, and you can interact with it via <a href="https://heiswap.exchange">heiswap.exchange</a>.</p>
+<p>The frontend consists of three main sections - Depositing, Withdrawing, and Status:</p>
+<div style="text-align: center">
+<img src="https://i.imgur.com/uRex2tO.png" />
+</div>
+<h2 id="depositing">Depositing</h2>
+<p>The following step depicts a typical process to deposit some Ethereum into the mixer. You’ll also need some extra Eth to pay for Gas.</p>
+<ol style="list-style-type: decimal">
+<li>Enter in an approved withdrawal address.</li>
+<li>Select the amount of Ethereum you would like to deposit</li>
+<li>*Check gas price, make sure it’s &gt; 0</li>
+<li>Click deposit, confirm the transaction on metamask, and a popup window with a randomly generate token should appear:</li>
+</ol>
+<div style="text-align: center">
+<img src="https://i.imgur.com/yRFDmtN.png" />
+</div>
+<p><br /></p>
+<ol start="5" style="list-style-type: decimal">
+<li><strong>Important</strong>: Save the hei-token somewhere safe, and send it to the party who is going to withdraw the deposited funds</li>
+</ol>
+<h2 id="withdrawing">Withdrawing</h2>
+<p>Unfortunately you’ll also need some Eth in the withdrawal account to withdraw the deposited funds, which are used to pay for Gas. It can be fixed with a relayer, which will be in future versions.</p>
+<ol style="list-style-type: decimal">
+<li>Login to the account with the withdrawal address specified in the depositing process.</li>
+</ol>
+<div style="text-align: center">
+<img src="https://i.imgur.com/ImWUlat.png" />
+</div>
+<p><br /> 2. Paste the received token into the provided textbox and press withdraw, which might lead to a few outcomes:</p>
+<p>2.1. The Ring is not closed, and it’ll prompt you to close the Ring in order to retrieve your funds. (The ring will automatically close once there is 5 participants in your pool). If you’re happen with the level of privacy, go ahead and close that pool, otherwise wait for more participants to come join the pool. Once the ring is closed, wait for a couple blocks to mature, head back to the “Withdrawal” tab, and try and withdraw again.</p>
+<div style="text-align: center">
+<img src="https://i.imgur.com/HjJMU5n.png" />
+</div>
+<br />
+<div style="text-align: center">
+<img src="https://i.imgur.com/VOeCjD6.png" />
+</div>
+<p><br /> 2.2. If you’re using an account which isn’t associated with the hei-token, or just an account with doesn’t have any withdrawals allocated to it, you’ll be presented with the following screen:</p>
+<div style="text-align: center">
+<img src="https://i.imgur.com/yTWL3VM.png" />
+</div>
+<p><br /> 3. If the withdrawal process is sucessful, you should be greeted with the following prompt:</p>
+<div style="text-align: center">
+<img src="https://i.imgur.com/J3amdHs.png" />
+</div>
+<p><br /></p>
+<h2 id="status">Status</h2>
+<p>The status tab is simply for convinience and is used to check if your deposit is “mature” or safe enough enough to be withdrawn (i.e. is there enough participants in the ring to mask the link between sender and receiver).</p>
+<ol style="list-style-type: decimal">
+<li>Simply paste the token into the provided textbox and click “Check Ring Status”</li>
+</ol>
+<div style="text-align: center">
+<img src="https://i.imgur.com/EYQRtxF.png" />
+</div>
+<p><br /> 2. If it’s a valid token, you should be greeted with a popup like so:</p>
+<div style="text-align: center">
+<img src="https://i.imgur.com/p156RcD.png" />
+</div>
+<p><br /></p>
+<h1 id="technicals">Technicals</h1>
+<p>Heiswap ulitlizes <a href="https://eprint.iacr.org/2004/281.pdf">Linkable Ring Signatures</a> in conjunction with (pseudo) <a href="https://monero.stackexchange.com/questions/1500/what-is-a-stealth-address/1506#1506">Stealth Address</a> to achieve zero-knowledge mixing.</p>
+<p>The signatures are <a href="https://github.com/kendricktan/heiswap-dapp/blob/d4e65fb3f22e4dbe0bac9b7f018c0e1d6fa4e22b/contracts/Heiswap.sol#L155">verified on the smart contract end</a>, while the signatures are <a href="https://github.com/kendricktan/heiswap-dapp/blob/d4e65fb3f22e4dbe0bac9b7f018c0e1d6fa4e22b/src/utils/AltBn128.js#L156">generated on the frontend</a>. That way, you don’t need to submit your private key to the smart contract ;).</p>
+<p>The addition of <a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-198.md">EIP 198</a> and <a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1895.md">EIP 1895</a> allows certain ECC operations to be executed for quite cheaply on the EVM now. The precompiles supports the alt-bn-128 curve, which is SNARKS related. I would like to build something that ultilizes SNARKS, but that’s for another time for me as I don’t have the in depth understanding of SNARKS as of right now.</p>
+<p>I ported over <a href="https://eprint.iacr.org/2004/281.pdf">Linkable Ring Signatures</a> onto the EVM, and had to make sure it was compatible with curve alt-bn-128 in order to ultilize those EVM precompiles.</p>
+<p>I won’t be explaining how these technologies work, but if you’re interested in how these components work individually, check out the <a href="https://cryptonote.org">cryptonote paper</a>, as this smart contract borrows a lot of ideas from that paper.</p>
+<h1 id="faq">FAQ</h1>
+<p>Is this audited?</p>
+<ul>
+<li>No. I don’t have the funds necessary to perform an audit.</li>
+</ul>
+<p>Will this be updated?</p>
+<ul>
+<li>Probably, I have a whole month before my next job :).</li>
+</ul>
+<p>Can I have the source code?</p>
+<ul>
+<li><a href="https://github.com/kendricktan/heiswap-dapp">Sure. Here you go.</a></li>
+</ul>
+<h1 id="future-improvements">Future Improvements</h1>
+<p>Add relayers so gasless tx can be achieved.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Yeah, I guess building this was quite fun :).</p>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>

@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>Oracles in Ethereum - A Simple Guide | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>Oracles in Ethereum - A Simple Guide</h1>
+             <div class="info">
+    Posted on 2017-11-06    
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<hr />
+<p><em>Motivation: I’ve been trying to find a tutorial on building an Oracle in Ethereum, only problem is that the articles online are either out of date (pre web3 v1.0.x) or the source code provided is structured in such a way that makes it incredibly tough to follow (having python, c# and javascript in one project with no clear description of what each language is doing and why its necessary). This guide assumes you have a basic understanding of the solidity language</em></p>
+<p><em>Goal: By the end of this guide, I hope to have helped you build and deploy your Oracle onto your own private testnet</em></p>
+<h2 id="click-here-for-the-boilerplate-project"><a href="https://github.com/kendricktan/ethoracle-barebones">&gt;&gt;&gt; Click here for the boilerplate project &lt;&lt;&lt;</a></h2>
+<hr />
+<h1 id="what-are-oracles">What are Oracles?</h1>
+<p>An Oracle is, simply put, a “smart contract” that is able to interact with the outside world, in the world of Ethereum that is known as <em>off-chain</em>. I put smart contracts in quotations because some people argue that Oracles aren’t exactly a <em>real</em> smart contract.</p>
+<p><strong>Example</strong>: Say you’re writing a smart contract that needs to retrieve weather data, however your contract can’t make arbitrary network requests on-chain. You need something that trustable (all user input aren’t) and is able to listen and respond to specific events on the blockchain. The solution: Oracles.</p>
+<p><img src="https://i.imgur.com/YBrFK7C.png" /></p>
+<h1 id="building-your-oracle">Building your Oracle</h1>
+<p>This guide will be building a simple Oracle that retrieves <a href="https://api.coinmarketcap.com/v1/global/">bitcoin’s total market cap from coinmarketcap</a> and store it into the blockchain.</p>
+<div class="sourceCode"><pre class="sourceCode json"><code class="sourceCode json"><span class="fu">{</span>
+    <span class="dt">&quot;total_market_cap_usd&quot;</span><span class="fu">:</span> <span class="fl">198558465250.0</span><span class="fu">,</span>  <span class="er">//</span> <span class="er">This</span> <span class="er">is</span> <span class="er">that</span> <span class="er">we</span> <span class="er">want</span> <span class="er">to</span> <span class="er">store</span>
+    <span class="dt">&quot;total_24h_volume_usd&quot;</span><span class="fu">:</span> <span class="fl">4974818568.0</span><span class="fu">,</span> 
+    <span class="dt">&quot;bitcoin_percentage_of_market_cap&quot;</span><span class="fu">:</span> <span class="fl">61.65</span><span class="fu">,</span> 
+    <span class="dt">&quot;active_currencies&quot;</span><span class="fu">:</span> <span class="dv">896</span><span class="fu">,</span> 
+    <span class="dt">&quot;active_assets&quot;</span><span class="fu">:</span> <span class="dv">360</span><span class="fu">,</span> 
+    <span class="dt">&quot;active_markets&quot;</span><span class="fu">:</span> <span class="dv">6442</span>
+<span class="fu">}</span></code></pre></div>
+<h2 id="setting-up-your-environment-and-tools">Setting up your environment and tools</h2>
+<p>I’ll be using the <a href="http://truffleframework.com/">truffle framework</a> and <a href="https://github.com/ethereumjs/testrpc">testrpc</a> for this guide. You can install them by running:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">npm</span> install -g truffle ethereumjs-testrpc</code></pre></div>
+<p>I’m using <a href="http://truffleframework.com/">truffle</a> because is has some really nice abstractions that allows me to interact with <a href="https://github.com/ethereum/web3.js/">web3</a> (almost) hassle free. Once you’ve installed <a href="http://truffleframework.com/">truffle</a> you can initialize a boilerplate by typing:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">mkdir</span> oracle-cmc <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> oracle-cmc
+<span class="ex">truffle</span> init
+<span class="ex">npm</span> install truffle-contract web3 bluebird fetch --save  # Dependencies</code></pre></div>
+<p>You should see the following files in your folder:</p>
+<center>
+<img src="https://i.imgur.com/riNmWAl.png" />
+</center>
+<h6 align="center">
+truffle boilerplate
+</h6>
+<p>Edit <strong>truffle.js</strong> (your truffle configuration file) to:</p>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="va">module</span>.<span class="at">exports</span> <span class="op">=</span> <span class="op">{</span>
+  <span class="co">// See &lt;http://truffleframework.com/docs/advanced/configuration&gt;</span>
+  <span class="co">// to customize your Truffle configuration!</span>
+  <span class="dt">migrations_directory</span><span class="op">:</span> <span class="st">&quot;./migrations&quot;</span><span class="op">,</span>
+  <span class="dt">networks</span><span class="op">:</span> <span class="op">{</span>
+    <span class="dt">development</span><span class="op">:</span> <span class="op">{</span>
+      <span class="dt">host</span><span class="op">:</span> <span class="st">&quot;localhost&quot;</span><span class="op">,</span>
+      <span class="dt">port</span><span class="op">:</span> <span class="dv">8545</span><span class="op">,</span>
+      <span class="dt">network_id</span><span class="op">:</span> <span class="st">&quot;*&quot;</span><span class="op">,</span> <span class="co">// Match any network id</span>
+      <span class="dt">gas</span><span class="op">:</span> <span class="dv">4710000</span>      
+    <span class="op">}</span>
+  <span class="op">}</span>
+<span class="op">}</span></code></pre></div>
+<p>This points <a href="http://truffleframework.com/">truffle</a> to our local private chain (<a href="https://github.com/ethereumjs/testrpc">testrpc</a>).</p>
+<p>Create four new files: <code>./contracts/CMCOracle.sol</code>, <code>./migrations/2_deploy_migrations.js</code>, <code>./client.js</code>, and <code>./oracle.js</code>. Your project folder should now look like:</p>
+<center>
+<img src="https://i.imgur.com/j06E7ex.png" />
+</center>
+<h6 align="center">
+project structure
+</h6>
+<h2 id="building-and-deploying-our-oracle-to-testrpc">Building and deploying our Oracle to testrpc</h2>
+<p>Edit the file <code>./contracts/CMCOracle.sol</code> so it looks like:</p>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript">pragma solidity <span class="op">^</span><span class="fl">0.4</span>.<span class="dv">17</span><span class="op">;</span>
+
+contract CMCOracle <span class="op">{</span>
+  <span class="co">// Contract owner</span>
+  address <span class="kw">public</span> owner<span class="op">;</span>
+
+  <span class="co">// BTC Marketcap Storage</span>
+  uint <span class="kw">public</span> btcMarketCap<span class="op">;</span>
+
+  <span class="co">// Callback function</span>
+  event <span class="at">CallbackGetBTCCap</span>()<span class="op">;</span>
+
+  <span class="kw">function</span> <span class="at">CMCOracle</span>() <span class="kw">public</span> <span class="op">{</span>
+    owner <span class="op">=</span> <span class="va">msg</span>.<span class="at">sender</span><span class="op">;</span>
+  <span class="op">}</span>
+
+  <span class="kw">function</span> <span class="at">updateBTCCap</span>() <span class="kw">public</span> <span class="op">{</span>
+    <span class="co">// Calls the callback function</span>
+    <span class="at">CallbackGetBTCCap</span>()<span class="op">;</span>
+  <span class="op">}</span>
+
+  <span class="kw">function</span> <span class="at">setBTCCap</span>(uint cap) <span class="kw">public</span> <span class="op">{</span>
+    <span class="co">// If it isn't sent by a trusted oracle</span>
+    <span class="co">// a.k.a ourselves, ignore it</span>
+    <span class="at">require</span>(<span class="va">msg</span>.<span class="at">sender</span> <span class="op">==</span> owner)<span class="op">;</span>
+    btcMarketCap <span class="op">=</span> cap<span class="op">;</span>
+  <span class="op">}</span>
+
+  <span class="kw">function</span> <span class="at">getBTCCap</span>() constant <span class="kw">public</span> <span class="at">returns</span> (uint) <span class="op">{</span>
+    <span class="cf">return</span> btcMarketCap<span class="op">;</span>
+  <span class="op">}</span>
+<span class="op">}</span></code></pre></div>
+<p>And the file <code>./migrations/2_deploy_contracts.js</code> to:</p>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> CMCOracle <span class="op">=</span> <span class="va">artifacts</span>.<span class="at">require</span>(<span class="st">&quot;./CMCOracle.sol&quot;</span>)<span class="op">;</span>
+
+<span class="va">module</span>.<span class="at">exports</span> <span class="op">=</span> <span class="kw">function</span>(deployer) <span class="op">{</span>
+  <span class="va">deployer</span>.<span class="at">deploy</span>(CMCOracle)<span class="op">;</span>
+<span class="op">};</span></code></pre></div>
+<p>Run <code>testrpc</code> in a separate terminal, and then <code>truffle compile &amp;&amp; truffle migrate</code>. This compiles our contracts and deploys them onto our private testnet.</p>
+<h2 id="oracle-and-client-logic">Oracle and Client logic</h2>
+<p>Edit <code>./oracle.js</code> so it looks like:</p>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> fetch <span class="op">=</span> <span class="at">require</span>(<span class="st">'fetch'</span>)
+<span class="kw">var</span> OracleContract <span class="op">=</span> <span class="at">require</span>(<span class="st">'./build/contracts/CMCOracle.json'</span>)
+<span class="kw">var</span> contract <span class="op">=</span> <span class="at">require</span>(<span class="st">'truffle-contract'</span>)
+
+<span class="kw">var</span> Web3 <span class="op">=</span> <span class="at">require</span>(<span class="st">'web3'</span>)<span class="op">;</span>
+<span class="kw">var</span> web3 <span class="op">=</span> <span class="kw">new</span> <span class="at">Web3</span>(<span class="kw">new</span> <span class="va">Web3</span>.<span class="va">providers</span>.<span class="at">HttpProvider</span>(<span class="st">'http://localhost:8545'</span>))<span class="op">;</span>
+
+<span class="co">// Truffle abstraction to interact with our</span>
+<span class="co">// deployed contract</span>
+<span class="kw">var</span> oracleContract <span class="op">=</span> <span class="at">contract</span>(OracleContract)
+<span class="va">oracleContract</span>.<span class="at">setProvider</span>(<span class="va">web3</span>.<span class="at">currentProvider</span>)
+
+<span class="co">// Dirty hack for web3@1.0.0 support for localhost testrpc</span>
+<span class="co">// see https://github.com/trufflesuite/truffle-contract/issues/56#issuecomment-331084530</span>
+<span class="cf">if</span> (<span class="kw">typeof</span> <span class="va">oracleContract</span>.<span class="va">currentProvider</span>.<span class="at">sendAsync</span> <span class="op">!==</span> <span class="st">&quot;function&quot;</span>) <span class="op">{</span>
+  <span class="va">oracleContract</span>.<span class="va">currentProvider</span>.<span class="at">sendAsync</span> <span class="op">=</span> <span class="kw">function</span>() <span class="op">{</span>
+    <span class="cf">return</span> <span class="va">oracleContract</span>.<span class="va">currentProvider</span>.<span class="va">send</span>.<span class="at">apply</span>(
+      <span class="va">oracleContract</span>.<span class="at">currentProvider</span><span class="op">,</span> arguments
+    )<span class="op">;</span>
+  <span class="op">};</span>
+<span class="op">}</span>
+
+<span class="co">// Get accounts from web3</span>
+<span class="va">web3</span>.<span class="va">eth</span>.<span class="at">getAccounts</span>((err<span class="op">,</span> accounts) <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="va">oracleContract</span>.<span class="at">deployed</span>()
+  .<span class="at">then</span>((oracleInstance) <span class="op">=&gt;</span> <span class="op">{</span>
+    <span class="co">// Watch event and respond to event</span>
+    <span class="co">// With a callback function  </span>
+    <span class="va">oracleInstance</span>.<span class="at">CallbackGetBTCCap</span>()
+    .<span class="at">watch</span>((err<span class="op">,</span> event) <span class="op">=&gt;</span> <span class="op">{</span>
+      <span class="co">// Fetch data</span>
+      <span class="co">// and update it into the contract</span>
+      <span class="va">fetch</span>.<span class="at">fetchUrl</span>(<span class="st">'https://api.coinmarketcap.com/v1/global/'</span><span class="op">,</span> (err<span class="op">,</span> m<span class="op">,</span> b) <span class="op">=&gt;</span> <span class="op">{</span>
+        <span class="kw">const</span> cmcJson <span class="op">=</span> <span class="va">JSON</span>.<span class="at">parse</span>(<span class="va">b</span>.<span class="at">toString</span>())
+        <span class="kw">const</span> btcMarketCap <span class="op">=</span> <span class="at">parseInt</span>(<span class="va">cmcJson</span>.<span class="at">total_market_cap_usd</span>)
+
+        <span class="co">// Send data back contract on-chain</span>
+        <span class="va">oracleInstance</span>.<span class="at">setBTCCap</span>(btcMarketCap<span class="op">,</span> <span class="op">{</span><span class="dt">from</span><span class="op">:</span> accounts[<span class="dv">0</span>]<span class="op">}</span>)
+      <span class="op">}</span>)
+    <span class="op">}</span>)
+  <span class="op">}</span>)
+  .<span class="at">catch</span>((err) <span class="op">=&gt;</span> <span class="op">{</span>
+    <span class="va">console</span>.<span class="at">log</span>(err)
+  <span class="op">}</span>)
+<span class="op">}</span>)</code></pre></div>
+<p>And <code>./client.js</code> so it looks like:</p>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> OracleContract <span class="op">=</span> <span class="at">require</span>(<span class="st">'./build/contracts/CMCOracle.json'</span>)
+<span class="kw">var</span> contract <span class="op">=</span> <span class="at">require</span>(<span class="st">'truffle-contract'</span>)
+
+<span class="kw">var</span> Web3 <span class="op">=</span> <span class="at">require</span>(<span class="st">'web3'</span>)<span class="op">;</span>
+<span class="kw">var</span> web3 <span class="op">=</span> <span class="kw">new</span> <span class="at">Web3</span>(<span class="kw">new</span> <span class="va">Web3</span>.<span class="va">providers</span>.<span class="at">HttpProvider</span>(<span class="st">'http://localhost:8545'</span>))<span class="op">;</span>
+
+<span class="co">// Truffle abstraction to interact with our</span>
+<span class="co">// deployed contract</span>
+<span class="kw">var</span> oracleContract <span class="op">=</span> <span class="at">contract</span>(OracleContract)
+<span class="va">oracleContract</span>.<span class="at">setProvider</span>(<span class="va">web3</span>.<span class="at">currentProvider</span>)
+
+<span class="co">// Dirty hack for web3@1.0.0 support for localhost testrpc</span>
+<span class="co">// see https://github.com/trufflesuite/truffle-contract/issues/56#issuecomment-331084530</span>
+<span class="cf">if</span> (<span class="kw">typeof</span> <span class="va">oracleContract</span>.<span class="va">currentProvider</span>.<span class="at">sendAsync</span> <span class="op">!==</span> <span class="st">&quot;function&quot;</span>) <span class="op">{</span>
+  <span class="va">oracleContract</span>.<span class="va">currentProvider</span>.<span class="at">sendAsync</span> <span class="op">=</span> <span class="kw">function</span>() <span class="op">{</span>
+    <span class="cf">return</span> <span class="va">oracleContract</span>.<span class="va">currentProvider</span>.<span class="va">send</span>.<span class="at">apply</span>(
+      <span class="va">oracleContract</span>.<span class="at">currentProvider</span><span class="op">,</span> arguments
+    )<span class="op">;</span>
+  <span class="op">};</span>
+<span class="op">}</span>
+
+<span class="va">web3</span>.<span class="va">eth</span>.<span class="at">getAccounts</span>((err<span class="op">,</span> accounts) <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="va">oracleContract</span>.<span class="at">deployed</span>()
+  .<span class="at">then</span>((oracleInstance) <span class="op">=&gt;</span> <span class="op">{</span>
+    <span class="co">// Our promises</span>
+    <span class="kw">const</span> oraclePromises <span class="op">=</span> [
+      <span class="va">oracleInstance</span>.<span class="at">getBTCCap</span>()<span class="op">,</span>  <span class="co">// Get currently stored BTC Cap</span>
+      <span class="va">oracleInstance</span>.<span class="at">updateBTCCap</span>(<span class="op">{</span><span class="dt">from</span><span class="op">:</span> accounts[<span class="dv">0</span>]<span class="op">}</span>)  <span class="co">// Request oracle to update the information</span>
+    ]
+
+    <span class="co">// Map over all promises</span>
+    <span class="va">Promise</span>.<span class="at">all</span>(oraclePromises)
+    .<span class="at">then</span>((result) <span class="op">=&gt;</span> <span class="op">{</span>
+      <span class="va">console</span>.<span class="at">log</span>(<span class="st">'BTC Market Cap: '</span> <span class="op">+</span> result[<span class="dv">0</span>])
+      <span class="va">console</span>.<span class="at">log</span>(<span class="st">'Requesting Oracle to update CMC Information...'</span>)
+    <span class="op">}</span>)
+    .<span class="at">catch</span>((err) <span class="op">=&gt;</span> <span class="op">{</span>
+      <span class="va">console</span>.<span class="at">log</span>(err)
+    <span class="op">}</span>)
+  <span class="op">}</span>)
+  .<span class="at">catch</span>((err) <span class="op">=&gt;</span> <span class="op">{</span>
+    <span class="va">console</span>.<span class="at">log</span>(err)
+  <span class="op">}</span>)
+<span class="op">}</span>)</code></pre></div>
+<p>You’ll notice that there’s some code duplication between the two (particularly in getting the web3 instance), I chose not to abstract that common functionality because I intent to keep this guide as barebones as possible.</p>
+<h1 id="testing-our-oracle">Testing our Oracle</h1>
+<p>Finally, run <code>node oracle.js</code> in the background, and run <code>node client.js</code> <strong>twice</strong> in another terminal. If you receive something similar to the following:</p>
+<center>
+<img src="https://i.imgur.com/ueE86ok.png" />
+</center>
+<p>Then congratulations! You’ve successfully setup your own Oracle!</p>
+<p>As you can see in our intiial request the market cap for bitcoin was 0 (default for <code>uint</code> in solidity). As we ran <code>client.js</code> we requested that the market cap be updated via the line <code>oracleInstance.updateBTCCap({from: accounts[0]})</code>. This triggers the event <code>CallbackGetBTCCap</code> which is handled by <code>oracle.js</code>, which fetches the bitcoin marketcap and updates the data in the smart contract.</p>
+<h1 id="final-thoughts">Final thoughts</h1>
+<p>Oracles are a necessity for smart contracts to interact with the outside world, as they act as the bridge between the on-chain and off-chain world. I hope having a barebones example will help any newcomers trying to find a way in this rapidly changing field.</p>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>

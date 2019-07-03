@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>Pederson Commitments | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } },
+        tex2jax: {
+          inlineMath: [ ['\\(','\\)'] ],
+          processEscapes: true,
+        },
+        "HTML-CSS": {                  
+          linebreaks: {                  
+            automatic: true                   
+          }                  
+        }
+      });
+    </script>    
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full">
+    </script>
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>Pederson Commitments</h1>
+             <div class="info">
+    Posted on 2019-01-20    
+    
+        by Kendrick Tan
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<h1 id="background">Background</h1>
+<p>While doing my <a href="https://www.youtube.com/watch?v=BBe1JzUxSB8">research</a> <a href="https://joinmarket.me/blog/blog/bulletpoints-on-bulletproofs/">on</a> <a href="https://doc-internal.dalek.rs/bulletproofs/notes/index.html">bulletproofs</a>, a common term kept popping up – Pederson Commitments. Only problem was that most of the articles I found online were very academic based, which contained lots of big words that I didn’t understand.</p>
+<p>This article will attempt to explain the motivation behind pederson commitments, how they work, accompanied with simple examples.</p>
+<h1 id="pederson-commitments">Pederson Commitments</h1>
+<h2 id="motivation">Motivation</h2>
+<p>Pederson Commitments, as the name suggests, is a type of <em>commitment scheme</em>. The goal of a commitment scheme is to allow a party to commit to a chosen value, without revealing that value, with the ability to reveal and verify the committed value later.</p>
+<p>One example use case would be betting – You want to let others know you’ve placed your bet by committing to a value. This lets the other parties know that you’ve placed your bet, but not what you betted on. Should you win the bet, you can reveal your committed value and retrieve your prize.</p>
+<h2 id="introduction">Introduction</h2>
+<p>Pederson Commitments, like any other commitment scheme needs to uphold two very important properties:</p>
+<ul>
+<li><strong>Hiding</strong> - The value chosen by the party, should not be known by anyone else</li>
+<li><strong>Binding</strong> - The only value that can verify the commited value is the inital chosen value.</li>
+</ul>
+<h3 id="hiding">Hiding</h3>
+<p>Pederson Commitments contains two generators - \(g, h\). If we only had one generator to hide the chosen value, an adversary could potentially look up tables of commonly committed values to figure out what value was committed.</p>
+<p>As such, we include a second generator \(h\) to add the extra randomness into the algorithm to fulfill the hiding property.</p>
+<h2 id="homomorphism">Homomorphism</h2>
+<p>For Pederson Commitments to work, it needs homomorphism. What this means is that it allows us to preserve structure between two arbitrary structures, e.g:</p>
+<div class="center">
+<p>\(f(a + b) = f(a) + f(b)\)</p>
+</div>
+<h2 id="algorithm">Algorithm</h2>
+<ol style="list-style-type: decimal">
+<li>Choose a large prime number \(p\)</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">p <span class="op">=</span> <span class="dv">260978677425009836700364089744760003717</span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li>Generate secret value \(s\) and generator \(g\) to be between \( (1, p - 1) \)</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">s <span class="op">=</span> random.randint(<span class="dv">1</span>, p <span class="op">-</span> <span class="dv">1</span>)
+g <span class="op">=</span> random.randint(<span class="dv">1</span>, p <span class="op">-</span> <span class="dv">1</span>)</code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>Generate generator \(h\) using \(h = g^s \ mod \ p\)</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">h <span class="op">=</span> <span class="bu">pow</span>(g, s, p)</code></pre></div>
+<ol start="4" style="list-style-type: decimal">
+<li>To commit a value \(c = g^v h^r \ mod \ p\), generate random value \(r\) between \( (1, p - 1) \)</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">v <span class="op">=</span> <span class="dv">42</span>
+r <span class="op">=</span> random.randint(<span class="dv">1</span>, p <span class="op">-</span> <span class="dv">1</span>)
+
+commited_value <span class="op">=</span> (<span class="bu">pow</span>(g, v, p) <span class="op">*</span> <span class="bu">pow</span>(h, r)) <span class="op">%</span> p</code></pre></div>
+<ol start="5" style="list-style-type: decimal">
+<li>Sender sends \(c\) to the receiver, and reveals \(v, r\) to the receiver at some point in the future. Receiver checks to see if the received commited value and the newly calculated value matches. (Note: \(g, h, p\) are known by the receiver in advance)</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># received r and v</span>
+calculated_commitment <span class="op">=</span> (<span class="bu">pow</span>(g, value, p) <span class="op">*</span> <span class="bu">pow</span>(h, r)) <span class="op">%</span> p
+
+<span class="cf">if</span> calculated_commitment <span class="op">==</span> commited_value:
+    <span class="bu">print</span>(<span class="st">'Verified!'</span>)</code></pre></div>
+<h2 id="proof-that-pederson-commitments-are-homomorphic">Proof That Pederson Commitments Are Homomorphic</h2>
+<p>Recall the formula to commit a value \( C(A) \):</p>
+<p><br /><span class="math display">$$
+\begin{align}
+C(A) &amp;= g^A \cdot  h^{r_A} \ mod \ p \newline
+C(A + B) &amp;= g^{A+B} \cdot  h^{r_A + r_B} \ mod \ p \newline \newline
+C(A) + C(B) &amp;= (g^A \cdot  h^{r_A} + g^B \cdot  h^{r_B}) \ mod \ p \newline
+&amp;= g^{A+B} \cdot h^{r_A + r_B} \ mod \ p \newline \newline
+\therefore C(A) + C(B) &amp;= C(A + B)
+\end{align}
+$$</span><br /></p>
+<h1 id="example">Example</h1>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> random
+
+<span class="co"># Prime number</span>
+p <span class="op">=</span> <span class="dv">260978677425009836700364089744760003717</span>
+
+<span class="co"># Generator</span>
+g <span class="op">=</span> random.randint(<span class="dv">1</span>, p <span class="op">-</span> <span class="dv">1</span>)
+
+
+<span class="kw">class</span> Verifier:
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, p, g):
+        <span class="va">self</span>.p <span class="op">=</span> p
+
+        <span class="co"># Generator</span>
+        <span class="va">self</span>.g <span class="op">=</span> g
+
+        <span class="co"># Secret number</span>
+        <span class="va">self</span>.s <span class="op">=</span> random.randint(<span class="dv">1</span>, p <span class="op">-</span> <span class="dv">1</span>)
+
+        <span class="co"># Hiding Generator - order of q and subgroup of Z_p</span>
+        <span class="va">self</span>.h <span class="op">=</span> <span class="bu">pow</span>(<span class="va">self</span>.g, <span class="va">self</span>.s, <span class="va">self</span>.p)
+
+    <span class="kw">def</span> add(<span class="va">self</span>, <span class="op">*</span>commitments):
+        <span class="co">&quot;&quot;&quot;</span>
+<span class="co">        Multiplying values in the pedersen commitment is</span>
+<span class="co">        similar to adding the values together before</span>
+<span class="co">        committing them</span>
+
+<span class="co">        Proof:</span>
+<span class="co">        C(A) x C(B) = (g^A)(h^(r_A)) * (g^B)(h^(r_B)) mod p</span>
+<span class="co">                    = g^(A+B) * h^(r_A + r_B) mod p</span>
+<span class="co">                    = C(A+B)</span>
+<span class="co">        &quot;&quot;&quot;</span>
+        cm <span class="op">=</span> <span class="dv">1</span>
+        <span class="cf">for</span> c <span class="kw">in</span> commitments:
+            cm <span class="op">=</span> cm <span class="op">*</span> c
+        <span class="cf">return</span> cm <span class="op">%</span> <span class="va">self</span>.p
+
+    <span class="kw">def</span> verify(<span class="va">self</span>, c, x, <span class="op">*</span>r) <span class="op">-&gt;</span> <span class="bu">bool</span>:
+        r_sum <span class="op">=</span> <span class="bu">sum</span>(r)
+
+        res <span class="op">=</span> (<span class="bu">pow</span>(<span class="va">self</span>.g, x, <span class="va">self</span>.p) <span class="op">*</span> <span class="bu">pow</span>(<span class="va">self</span>.h, r_sum, <span class="va">self</span>.p)) <span class="op">%</span> <span class="va">self</span>.p
+
+        <span class="cf">if</span> c <span class="op">==</span> res:
+            <span class="cf">return</span> <span class="va">True</span>
+        <span class="cf">return</span> <span class="va">False</span>
+
+
+<span class="kw">class</span> Prover:
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, p, g, h):
+        <span class="va">self</span>.p <span class="op">=</span> p
+        <span class="va">self</span>.g <span class="op">=</span> g
+        <span class="va">self</span>.h <span class="op">=</span> h
+
+    <span class="kw">def</span> commit(<span class="va">self</span>, value):
+        <span class="co">&quot;&quot;&quot;</span>
+<span class="co">        C(x) = (g^x)*(h^r) mod p</span>
+
+<span class="co">        where h = (g^s) mod p</span>
+<span class="co">        &quot;&quot;&quot;</span>
+        r <span class="op">=</span> random.randint(<span class="dv">1</span>, <span class="va">self</span>.p <span class="op">-</span> <span class="dv">1</span>)
+
+        <span class="co"># Commit message</span>
+        c <span class="op">=</span> (<span class="bu">pow</span>(<span class="va">self</span>.g, value, <span class="va">self</span>.p) <span class="op">*</span> <span class="bu">pow</span>(<span class="va">self</span>.h, r, <span class="va">self</span>.p)) <span class="op">%</span> <span class="va">self</span>.p
+
+        <span class="cf">return</span> c, r
+
+
+<span class="co"># Values we want to commit and prove later on</span>
+value1 <span class="op">=</span> <span class="dv">50</span>
+value2 <span class="op">=</span> <span class="dv">42</span>
+
+<span class="co"># Verifier and prover</span>
+verifier <span class="op">=</span> Verifier(p, g)
+prover <span class="op">=</span> Prover(p, g, verifier.h)
+
+<span class="co"># Commit message</span>
+c1, r1 <span class="op">=</span> prover.commit(value1)
+c2, r2 <span class="op">=</span> prover.commit(value2)
+
+<span class="co"># Verify result</span>
+result1 <span class="op">=</span> verifier.verify(c1, value1, r1)
+result2 <span class="op">=</span> verifier.verify(c2, value2, r2)
+
+<span class="cf">if</span> result1:
+    <span class="bu">print</span>(<span class="st">'Verified commitment 1'</span>)
+<span class="cf">else</span>:
+    <span class="bu">print</span>(<span class="st">'Commitment 1 unverified'</span>)
+
+<span class="cf">if</span> result2:
+    <span class="bu">print</span>(<span class="st">'Verified commitment 2'</span>)
+<span class="cf">else</span>:
+    <span class="bu">print</span>(<span class="st">'Commitment 2 unverified'</span>)
+
+<span class="co"># Prove homomorphic property</span>
+c_sum <span class="op">=</span> verifier.add(c1, c2)
+value_sum <span class="op">=</span> value1 <span class="op">+</span> value2
+
+result_sum <span class="op">=</span> verifier.verify(c_sum, value_sum, r1, r2)
+
+<span class="cf">if</span> result_sum:
+    <span class="bu">print</span>(<span class="st">'Verified homomorphic property'</span>)
+<span class="cf">else</span>:
+    <span class="bu">print</span>(<span class="st">'Homomorphic property not verified'</span>)</code></pre></div>
+<h1 id="conclusion">Conclusion</h1>
+<p>As I’m typing this, I realized that homomorphism is basically a functor abstraction.</p>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>

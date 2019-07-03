@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>Statistical Proof of Shitposting in Crypto Subreddits | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>Statistical Proof of Shitposting in Crypto Subreddits</h1>
+             <div class="info">
+    Posted on 2018-03-01    
+    
+        by Kendrick Tan
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<h1 id="prelude">Prelude</h1>
+<p>A couple of days ago, an idea came to mind:</p>
+<p><em>Crypto-currencies that have a high marketcap must have a consensus on quality discussions within their community that distinguishes themselves from the rest of the pack.</em></p>
+<p>Sounds like a reasonable hypothesis, no? Now if I could somehow find cryptocurrencies with a similar pattern of quality discussions on Reddit which haven’t ‘mooned’ yet, I could potentially make bank ( ͡° ͜ʖ ͡°).</p>
+<p>Oh boy, was I so <strong>wrong</strong>.</p>
+<h1 id="data-aggregration-and-processing">Data Aggregration and Processing</h1>
+<p>After checking out a couple of platforms I decided to settle on aggregating data from Reddit because:</p>
+<ol style="list-style-type: decimal">
+<li>Most, if not all crypto-projects have a subreddit</li>
+<li>Relatively active community</li>
+<li>Lots of documentation on how to aggregate data from Reddit</li>
+</ol>
+<p>I started off by getting the top 350 coins and their official subreddit. The marketcap of the lowest and highest from the list ranged from 20 mil all the way up to 100 bil, so I thought I had a pretty diverse range. I obtained the data via <a href="https://api.coinmarketcap.com/v1/ticker/?limit=350">coinmarketcap’s api</a>.</p>
+<p>Next up was associating each project with their relavent subreddit. There wasn’t an easy and reliable way to automate it, and so much of it was <a href="https://github.com/kendricktan/cryptoshitposting/blob/master/data/subreddits.json">done by hand</a> (ง’̀-’́)ง.</p>
+<p>With the list of subreddits, I can now easily grab the top titles and their respective updoots via the JSON endpoint. E.g.: <code>reddit.com/r/ethereum/top/.json</code></p>
+<p>Once that was complete I chucked the aggregated data into <a href="http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html">TfidfVectorizer</a> which returns me an <code>N</code> dimensional matrix that describes the document. The output is then passed the output through <a href="http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html">PCA</a> which compresses the <code>N</code> dimensional matix into 2D so we can visualize it.</p>
+<h1 id="analyzing-the-data">Analyzing the Data</h1>
+<p>Recall the hypothesis:</p>
+<pre><code>quality content = quality community = quality crypto
+shit    content = shit    community = shit    crypto</code></pre>
+<p>In an ideal world, we should be able to see crypto communities with a similar marketcap cluster together, like the graph below. (Pay no attention to the metrics / axis as they’re just the top 2 principal components of the data. Just focus on where the data-point is positioned relative to their marketcap.)</p>
+<center>
+<img src="//i.imgur.com/s6VwjYV.png" />
+</center>
+<p>But instead we got:</p>
+<center>
+<img src="//i.imgur.com/IjWOGCs.png">
+</center>
+<p>Notice how most the points <em>regardless</em> of marketcap congregate in one area. That basically means that crypto-subreddits regardless of marketcap, posts similar content. Now go to any crypto subreddit, filter by top of &lt;period&gt;, you should see that it’s a shit post. So according to the original hypothesis, all posts are now shitposts. BAM! There you go! <strong>You now have statistical proof that all top posts on crypto-subreddits comprises of shitposts</strong>.</p>
+<p>Some people with a sharp eye might argue, hey, what about that mid-right section? You know that section comprises mostly of 500Mil++ marketcap. What does that contain?</p>
+<center>
+<img src="//i.imgur.com/Mvtxkd6.png">
+</center>
+<p>I will admit, that got me excited for a second, until I analyzed what those points represented:</p>
+<center>
+<img src="//i.imgur.com/1B344iz.png">
+</center>
+<p>Turns out, that section represented reddit titles which had the word <code>bitcoin</code> in it. Naturally bitcoin and bitcoin-cash frequently had that word in their titles, which represented the majority of the points in that section. When it was used in other high marketcap crypto subreddit it was used to amplify its (the respective crypto) superiority over bitcoin. Anyhow, no worries, it’s still a shitpost amirite?</p>
+<p>Analyzing top posts by month yields the same result:</p>
+<center>
+<img src="//i.imgur.com/vKaFfMU.png">
+</center>
+<h1 id="conclusion-and-tldr">Conclusion and Tl;DR</h1>
+<p>All crypto subreddits rewards shitposting behavior.</p>
+<h1 id="misc">Misc</h1>
+<p>If you want to play around with your own graphs you can grab the <a href="https://github.com/kendricktan/cryptoshitposting">cryptoshitposting repository here</a>.</p>
+<p>You should also <a href="https://www.instagram.com/mr.miso.oz/">follow my favorite cat on instagram: mr.miso.oz</a>.</p>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>

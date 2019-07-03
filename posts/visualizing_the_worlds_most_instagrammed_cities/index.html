@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.55" />
+    <meta name="keywords" content="Kendrick Tan,Linux,Software,Backend,Frontend,Fullstack,Data Science,Haskell,Functional Programming,Machine Learning,Blockchain,Python,Web Development" />
+    <meta name="description" content="I'm Kendrick Tan, a Software Engineer. I enjoy writing clean and maintainable code." />
+    
+    <title>Visualizing the Worlds Most Instagrammed Cities | Kendrick Tan</title>
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/simple-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../../assets/css/syntax.css" />
+    <link href="../../assets/images/fav.png" rel="shortcut icon" />
+    <meta name="google-site-verification" content="URddx6H5g_y_Y0QQSKvLFPZDSBZegLj4J1VCdqEvoBw" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71060764-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-71060764-2');
+</script>
+
+    
+    
+  </head>
+  <body>
+    <div class="navigation">
+      <ul class="navigation_list">
+        <li class="navigation_item"><a href="../../">Home</a></li>
+        <li class="navigation_item"><a href="../../posts/">Posts</a></li>
+        <li class="navigation_item"><a href="../../projects/">Projects</a></li>
+        <li class="navigation_item"><a href="https://goo.gl/m2EgR2">Resume</a></li>
+        <li class="navigation_item"><a href="../../talks/">Talks</a></li>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content">
+            
+            <h1>Visualizing the Worlds Most Instagrammed Cities</h1>
+             <div class="info">
+    Posted on 2018-11-08    
+    
+        by Kendrick Tan
+    
+</div>
+
+<br />
+
+<div class="content-body">
+
+<h1 id="prelude">Prelude</h1>
+<p>For one of my (now retired) projects, I wanted to make use of a bunch of Instagram data, and so I scrapped them.</p>
+<p>Amongst the scrapped data was all the cities in the world, along with the number of Instagram posts that ‘tagged’ that particular city.</p>
+<p>I thought it would be cool to do a quick visualization of the data, and so I did.</p>
+<h1 id="most-instagrammed-cities---heatmap">Most Instagrammed Cities - Heatmap</h1>
+<h3 id="click-here-or-use-chrome-if-the-map-below-doesnt-load-full-page-view."><a href="../../assets/iframe/insta_cities_viz_simple">Click here or use chrome if the map below doesn’t load (full page view)</a>.</h3>
+<p>Should you wish to play around with the extracted data or create your own visualization, I’ve made the tools and data available <a href="https://github.com/kendricktan/visualizing-worlds-most-grammed-cities">here</a>.</p>
+<iframe style="width: 100%; height: 500px" src="https://kndrck.co/assets/iframe/insta_cities_viz_simple">
+</iframe>
+<h2 id="top-25-most-instagrammed-cities">Top 25 Most Instagrammed Cities</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Number</th>
+<th align="left">Location</th>
+<th align="right">Instagram Tags</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">Moscow, Russia</td>
+<td align="right">38205661</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">New York, New York</td>
+<td align="right">37436116</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">London, United Kingdom</td>
+<td align="right">32812081</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">São Paulo, Brazil</td>
+<td align="right">27399613</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">Paris, France</td>
+<td align="right">24334690</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">Los Angeles, California</td>
+<td align="right">24437297</td>
+</tr>
+<tr class="odd">
+<td align="left">7</td>
+<td align="left">Saint Petersburg, Russia</td>
+<td align="right">22318754</td>
+</tr>
+<tr class="even">
+<td align="left">8</td>
+<td align="left">Istanbul, Turkey</td>
+<td align="right">17671196</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">Jakarta, Indonesia</td>
+<td align="right">14021225</td>
+</tr>
+<tr class="even">
+<td align="left">10</td>
+<td align="left">Barcelona, Spain</td>
+<td align="right">13204513</td>
+</tr>
+<tr class="odd">
+<td align="left">11</td>
+<td align="left">Rio de Janeiro, Rio de Janeiro</td>
+<td align="right">12867293</td>
+</tr>
+<tr class="even">
+<td align="left">12</td>
+<td align="left">Amsterdam, Netherlands</td>
+<td align="right">12649225</td>
+</tr>
+<tr class="odd">
+<td align="left">13</td>
+<td align="left">Rome, Italy</td>
+<td align="right">12430318</td>
+</tr>
+<tr class="even">
+<td align="left">14</td>
+<td align="left">Bogotá, Colombia</td>
+<td align="right">12377166</td>
+</tr>
+<tr class="odd">
+<td align="left">15</td>
+<td align="left">Kyiv, Ukraine</td>
+<td align="right">12181768</td>
+</tr>
+<tr class="even">
+<td align="left">16</td>
+<td align="left">Chicago, Illinois</td>
+<td align="right">11977498</td>
+</tr>
+<tr class="odd">
+<td align="left">17</td>
+<td align="left">Bangkok, Thailand</td>
+<td align="right">11963566</td>
+</tr>
+<tr class="even">
+<td align="left">18</td>
+<td align="left">Dubai, United Arab Emirates</td>
+<td align="right">12146149</td>
+</tr>
+<tr class="odd">
+<td align="left">19</td>
+<td align="left">Berlin, Germany</td>
+<td align="right">11793611</td>
+</tr>
+<tr class="even">
+<td align="left">20</td>
+<td align="left">Toronto, Ontario</td>
+<td align="right">10940502</td>
+</tr>
+<tr class="odd">
+<td align="left">21</td>
+<td align="left">Madrid, Spain</td>
+<td align="right">10912860</td>
+</tr>
+<tr class="even">
+<td align="left">22</td>
+<td align="left">San Francisco, California</td>
+<td align="right">9839629</td>
+</tr>
+<tr class="odd">
+<td align="left">23</td>
+<td align="left">Tehran, Iran</td>
+<td align="right">8769589</td>
+</tr>
+<tr class="even">
+<td align="left">24</td>
+<td align="left">Mexico City, Mexico</td>
+<td align="right">8339764</td>
+</tr>
+<tr class="odd">
+<td align="left">25</td>
+<td align="left">Prague, Czech Republic</td>
+<td align="right">8067410</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+ 
+            <hr />
+            <div class="block">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = "kendricktangithubio"; 
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+ 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/kendricktan">github</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://twitter.com/kendricktrh">twitter</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+        <a href="https://www.linkedin.com/in/tankendrick/">linkedin</a>&nbsp;&nbsp;/&nbsp;&nbsp;
+          me [at] kndrck.co
+    </div>
+  </body>
+</html>
