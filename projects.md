@@ -6,6 +6,12 @@ The projects listed here are just __some__ of my recent projects, [you may find 
 
 <hr />
 
+## Heiswap
+> Ethereum Mixer ultilizing Ring Signatures and Stealth Addresses
+
+- [GitHub](https://github.com/kendricktan/heiswap-dapp)
+- [Live Demo](https://heiswap.exchange)
+
 ## BrainsFree
 > BrainFuck interpreter written in Haskell using Free Monads to construct BrainFuck's DSL.
 
