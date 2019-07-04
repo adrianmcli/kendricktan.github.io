@@ -57,7 +57,7 @@ Unfortunately you'll also need some Eth in the withdrawal account to withdraw th
 <div style="text-align: center"><img src="https://i.imgur.com/ImWUlat.png"/></div><br />
 2. Paste the received token into the provided textbox and press withdraw, which might lead to a few outcomes:
     
-2.1. The Ring is not closed, and it'll prompt you to close the Ring in order to retrieve your funds. (The ring will automatically close once there is 5 participants in your pool). If you're happen with the level of privacy, go ahead and close that pool, otherwise wait for more participants to come join the pool. Once the ring is closed, wait for a couple blocks to mature, head back to the "Withdrawal" tab, and try and withdraw again.
+2.1. The Ring is not closed, and it'll prompt you to close the Ring in order to retrieve your funds. (The ring will automatically close once there is 5 participants in your pool). If you're happy with the level of privacy, go ahead and close that pool, otherwise wait for more participants to come join the pool. Once the ring is closed, wait for a couple blocks to mature, head back to the "Withdrawal" tab, and try to withdraw again.
 
 <div style="text-align: center"><img src="https://i.imgur.com/HjJMU5n.png"/></div><br />
 <div style="text-align: center"><img src="https://i.imgur.com/VOeCjD6.png"/></div><br />
@@ -70,7 +70,7 @@ Unfortunately you'll also need some Eth in the withdrawal account to withdraw th
 
 ## Status
 
-The status tab is simply for convinience and is used to check if your deposit is "mature" or safe enough enough to be withdrawn (i.e. is there enough participants in the ring to mask the link between sender and receiver).
+The status tab is simply for convenience and is used to check if your deposit is "mature" or safe enough to be withdrawn (i.e. are there enough participants in the ring to mask the link between sender and receiver).
 
 1. Simply paste the token into the provided textbox and click "Check Ring Status"
 
@@ -85,11 +85,11 @@ Heiswap ulitlizes <a href="https://eprint.iacr.org/2004/281.pdf">Linkable Ring S
 
 The signatures are [verified on the smart contract end](https://github.com/kendricktan/heiswap-dapp/blob/d4e65fb3f22e4dbe0bac9b7f018c0e1d6fa4e22b/contracts/Heiswap.sol#L155), while the signatures are [generated on the frontend](https://github.com/kendricktan/heiswap-dapp/blob/d4e65fb3f22e4dbe0bac9b7f018c0e1d6fa4e22b/src/utils/AltBn128.js#L156). That way, you don't need to submit your private key to the smart contract ;).
 
-The addition of [EIP 198](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-198.md) and [EIP 1895](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1895.md) allows certain ECC operations to be executed for quite cheaply on the EVM now. The precompiles supports the alt-bn-128 curve, which is SNARKS related. I would like to build something that ultilizes SNARKS, but that's for another time for me as I don't have the in depth understanding of SNARKS as of right now.
+The addition of [EIP 198](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-198.md) and [EIP 1895](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1895.md) allows certain ECC operations to be executed for quite cheaply on the EVM now. The precompiles supports the alt-bn-128 curve, which is SNARKS related. I would like to build something that ultilizes SNARKS, but that's for another time as I do not yet have an in-depth understanding of SNARKS right now.
 
 I ported over <a href="https://eprint.iacr.org/2004/281.pdf">Linkable Ring Signatures</a> onto the EVM, and had to make sure it was compatible with curve alt-bn-128 in order to ultilize those EVM precompiles.
 
-I won't be explaining how these technologies work, but if you're interested in how these components work individually, check out the [cryptonote paper](https://cryptonote.org), as this smart contract borrows a lot of ideas from that paper.
+I won't be explaining how these technologies work, but if you're interested check out the [cryptonote paper](https://cryptonote.org), as this smart contract borrows a lot of ideas from that paper.
 
 # FAQ
 
